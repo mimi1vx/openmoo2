@@ -335,6 +335,10 @@ class Archive():
     def get_surface(self, picture_id, picture_frame, local_palette, color_key = None):
         return self.load_surface(self.read_picture(picture_id), picture_frame, local_palette, color_key)
 
+    def read_font(self, font_id):
+        """reads a font glyphs data of given font id"""
+        return Font(self.read_file(0), font_id)
+
     def read_palette(self, i):
         data = self.read_file(i)
         if not data:
@@ -371,3 +375,179 @@ class Archive():
             return palette
 
 # end class Archive
+
+"""
+MOO2 Game fonts are stored in FONTS.LBX:000 and IFONTS.LBX:000
+Both of the font resources contain definition of 6 fonts
+
+http://www.spheriumnorth.com/orion-forum/nfphpbb/viewtopic.php?t=91&highlight=font
+
+offset ~ offset         size        meaning
+0x0000 ~ 0x0071:	0x72
+
+0x0072 ~ 0x016b:			all bytes containing 08
+0x016c ~ 0x0567:			???
+0x0568 ~ 0x059b:			???
+
+0x059c ~ 0x069b:	0x100       font #1 glyphs widths
+0x069c ~ 0x079b:	0x100       font #2 glyphs widths
+0x079c ~ 0x089b:	0x100       font #3 glyphs widths
+0x089c ~ 0x099b:	0x100       font #4 glyphs widths
+0x099c ~ 0x0a9b:	0x100       font #5 glyphs widths
+0x0a9c ~ 0x0b9b:	0x100       font #6 glyphs widths
+
+0x0b9c ~ 0x0f9b:	0x400       font 1 offsets of each glyph; 0000 means beginning of glyph data, not of lbx resource.
+0x0f9c ~ 0x139b:	0x400       font 2 offsets of each glyph; 0000 means beginning of glyph data, not of lbx resource.
+0x139c ~ 0x179b:	0x400       font 3 offsets of each glyph; 0000 means beginning of glyph data, not of lbx resource.
+0x179c ~ 0x1b9b:	0x400       font 4 offsets of each glyph; 0000 means beginning of glyph data, not of lbx resource.
+0x1b9c ~ 0x1f9b:	0x400       font 5 offsets of each glyph; 0000 means beginning of glyph data, not of lbx resource.
+0x1f9c ~ 0x239b:	0x400       font 6 offsets of each glyph; 0000 means beginning of glyph data, not of lbx resource.
+
+0x239c ~			    font 1 data
+                                    font data is a sequence of bytes meaning the following:
+                                    0x00-0x7f: color of next pixel
+                                    0x80: skip to beginning of next line
+                                    0x8n: skip n pixels
+"""
+
+class Font():
+
+    def __init__(self, font_file_data, font_id):
+        self.__glyphs = {}
+        for glyph_id in range(32, 128):
+            self.__read_glyph(font_file_data, font_id, glyph_id)
+        
+    def __read_glyph_width(self, font_file_data, font_id, glyph_id):
+        return ord(font_file_data[0x059c + (font_id << 8) + glyph_id])
+
+    def __read_glyph_offset(self, font_file_data, font_id, glyph_id):
+        font_offset = 0x0b9c + (font_id << 10)
+        glyph_offset = glyph_id << 2
+        b1 = ord(font_file_data[font_offset + glyph_offset])
+        b2 = ord(font_file_data[font_offset + glyph_offset + 1])
+        b3 = ord(font_file_data[font_offset + glyph_offset + 2])
+        b4 = ord(font_file_data[font_offset + glyph_offset + 3])
+        return 0x239c + (b4 << 24) + (b3 << 16) + (b2 << 8) + b1
+
+    def __read_glyph_data(self, font_file_data, font_id, glyph_id):
+        off1 = self.__read_font_glyph_offset(font_file_data, font_id, glyph_id)
+        off2 = self.__read_font_glyph_offset(font_file_data, font_id, glyph_id + 1)
+        return fdata[off1:off2]
+
+    def __read_glyph_data(self, font_file_data, font_id, glyph_id):
+        off1 = self.__read_glyph_offset(font_file_data, font_id, glyph_id)
+        off2 = self.__read_glyph_offset(font_file_data, font_id, glyph_id + 1)
+        return font_file_data[off1:off2]
+
+    def get_glyph_width(self, glyph_id):
+        return self.__glyphs[glyph_id]['width']
+
+    def get_glyph_height(self, glyph_id):
+        return self.__glyphs[glyph_id]['height']
+
+    def __read_glyph(self, font_file_data, font_id, glyph_id):
+        raw_data = self.__read_glyph_data(font_file_data, font_id, glyph_id)
+        width = self.__read_glyph_width(font_file_data, font_id, glyph_id)
+
+        data = [[]]
+
+        height = 0
+        for v in raw_data:
+            v = ord(v)
+            if v < 0x80:
+                data[height].append(v)
+            elif v == 0x80:
+                data.append([])
+                height += 1
+            elif v > 0x7f:
+                data[height].extend([0] * (v & 0x7f))
+
+        self.__glyphs[glyph_id] =  {'width': width, 'height': height + 1, 'data': data }
+    
+    def get_glyph(self, glyph_id):
+        return self.__glyphs[glyph_id]
+
+    def debug_glyph(self, glyph_id, ascii_palette = " .X*45678"):
+        glyph = self.get_glyph(glyph_id)
+
+        print("=== glyph %i ... %s ===" % (glyph_id, chr(glyph_id)))
+        print("	width = %i" % glyph['width'])
+        print("    data size = %i" % len(glyph['data']))
+
+        for row in glyph['data']:
+            line = ""
+            for color in row:
+                line += ascii_palette[color]
+            print(line)
+
+        print("/// glyph ///")
+        print("")
+
+    def debug(self, ascii_palette = " .X*45678"):
+        for glyph_id in range(65, 91):
+            self.debug_glyph(glyph_id, ascii_palette)
+
+    def debug_write(self, text, ascii_palette = " 12345678", letter_spacing = 2	):
+        glyphs = {}
+        width = 0
+        height = 0
+        for c in text:
+            glyph_id = ord(c)
+            if not glyphs.has_key(glyph_id):
+                glyphs[glyph_id] = self.get_glyph(glyph_id)
+                if glyphs[glyph_id]['height'] > height:
+                    height = glyphs[glyph_id]['height']
+            width += glyphs[glyph_id]['width'] + letter_spacing
+
+        matrix = []
+        for l in range(height):
+            matrix.append([" "] * width)
+            
+        x = 0
+        for c in text:
+            glyph_id = ord(c)
+            y = 0
+            for glyph_row in glyphs[glyph_id]['data']:
+                xx = 0
+                for color in glyph_row:
+                    matrix[y][x + xx] = ascii_palette[color]
+                    xx += 1
+                y += 1
+            x += glyphs[glyph_id]['width'] + letter_spacing
+
+        line = ""
+        for row in matrix:
+            for color in row:
+                line += color
+            print(line)
+            line = ""
+
+
+    def render_char(self, pxarray, x, y, char, palette):
+        glyph = self.get_glyph(ord(char))
+        yy = 0
+        for row in glyph['data']:
+            xx = 0
+            for color in row:
+                if color:
+                    pxarray[x + xx][y + yy] = palette[color]
+                xx += 1
+            yy += 1
+        return glyph['width']
+                
+
+    def write_text(self, surface, x, y, text, palette, letter_spacing = 1):
+        pxarray = pygame.PixelArray (surface)
+        xx = 0
+        for c in text:
+            xx += self.render_char(pxarray, x + xx, y, c, palette) + letter_spacing
+
+    def render(self, text, palette, letter_spacing = 1):
+        width, height = 0, 0
+        for c in text:
+            width += self.get_glyph_width(ord(c)) + letter_spacing
+            height = max(height, self.get_glyph_height(ord(c)))
+        surface = pygame.Surface((width, height))
+        surface.set_colorkey(0x000000)
+        self.write_text(surface, 0, 0, text, palette, letter_spacing)
+        return surface
