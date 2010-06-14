@@ -142,9 +142,9 @@ def moo2_draw_image_frame(surface, picture, frame, localPalette, x=0, y=0, DEBUG
 #                	pixel = ord(picture['data'][pos])
 #			print "		got alpha: %i" % localPalette[pixel]['alpha']
 #		    else:
-            	    px[X][Y] = localPalette[pixel]['rgb']
+                    px[X][Y] = localPalette[pixel]['rgb']
 #                	pixel = ord(picture['data'][pos])
-            	    pos += 1
+                    pos += 1
 # put-pixel onto surface
 #                    px[X][Y] = localPalette[pixel]['rgb']
                     X += 1
@@ -264,7 +264,7 @@ class Archive():
 #                print "good signature"
                 self.__version = self.read(2)
 
-            	self.__info = []
+                self.__info = []
                 off2 = self.__read_int_4b_le()
                 for i in range(n):
                         off1 = off2
