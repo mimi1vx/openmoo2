@@ -2,11 +2,7 @@ import os
 
 import lbx
 
-import star
-import planet
-import colony
-import player
-import starship
+import universe
 
 def compose_int(b0, b1, b2 = 0, b3 = 0):
     return b0 + (b1 << 8) + (b2 << 16) + (b3 << 24)
@@ -272,7 +268,7 @@ class Moo2Savegame():
 #            print "player @ %x" % offset
 
 #            players.append({
-            players[player_id] = player.Player(player_id)
+            players[player_id] = universe.Player(player_id)
 #            pl[player_id].import_from_moo2(self.__data[offset:offset + PLAYER_RECORD_SIZE])
             players[player_id].set_emperor_name(lbx.read_string(self.__data, offset, 15))
             players[player_id].set_race_name(lbx.read_string(self.__data, offset + 0x14, 36))
@@ -339,31 +335,31 @@ class Moo2Savegame():
                 offset2 = offset + 0x649 + (ii)
                 players[player_id].add_tribute(ord(self.__data[offset2]))
 #            players[player_id].set_()
-            players[8] = player.Player(8)
+            players[8] = universe.Player(8)
             players[8].set_race_name("Antareans")
             players[8].set_emperor_name("Antarean")
 
-            players[9] = player.Player(8)
+            players[9] = universe.Player(8)
             players[9].set_race_name("Orion")
             players[9].set_emperor_name("Loknar")
 
-            players[10] = player.Player(10)
+            players[10] = universe.Player(10)
             players[10].set_race_name("Space Amoeba")
             players[10].set_emperor_name("Amoeba")
 
-            players[11] = player.Player(11)
+            players[11] = universe.Player(11)
             players[11].set_race_name("Space Crystal")
             players[11].set_emperor_name("Crystal")
 
-            players[12] = player.Player(12)
+            players[12] = universe.Player(12)
             players[12].set_race_name("Space Dragon")
             players[12].set_emperor_name("Dragon")
 
-            players[13] = player.Player(13)
+            players[13] = universe.Player(13)
             players[13].set_race_name("Space Eeel")
             players[13].set_emperor_name("Eel")
 
-            players[14] = player.Player(14)
+            players[14] = universe.Player(14)
             players[14].set_race_name("Space Hydra")
             players[14].set_emperor_name("Hydra")
 
@@ -419,7 +415,7 @@ class Moo2Savegame():
         for star_id in range(c):
             offset = SOLAR_SYSTEMS_DATA_OFFSET + (SOLAR_SYSTEM_RECORD_SIZE * star_id)
 
-            stars[star_id] = star.Star(star_id)
+            stars[star_id] = universe.Star(star_id)
             stars[star_id].import_from_moo2(self.__data[offset:offset + SOLAR_SYSTEM_RECORD_SIZE])
         return stars
 
@@ -567,7 +563,7 @@ class Moo2Savegame():
     #        system_number = ord(self.__data[offset + 0x02])
     #        position = ord(self.__data[offset + 0x03])
 #            planets.append({
-            planets[planet_id] = planet.Planet(planet_id)
+            planets[planet_id] = universe.Planet(planet_id)
             planets[planet_id].import_from_moo2(self.__data[offset:offset + PLANET_RECORD_SIZE])
 #            pl[planet_id] = {
 #                'planet_id':        planet_id,
@@ -603,7 +599,7 @@ class Moo2Savegame():
         for colony_id in range(c):
 #            print("Moo2Savegame::parse_colonies() ... colony_id = %i" % colony_id)
             offset	= COLONIES_DATA_OFFSET + (COLONY_RECORD_SIZE * colony_id)
-            colonies[colony_id] = colony.Colony(colony_id)
+            colonies[colony_id] = universe.Colony(colony_id)
             colonies[colony_id].import_from_moo2(self.__data[offset:offset + COLONY_RECORD_SIZE])
 #            print
         return colonies
@@ -650,7 +646,7 @@ class Moo2Savegame():
         offset          = SAVE_SHIPS_OFFSET + (SAVE_SHIP_RECORD_SIZE * ship_id)
         data = self.__data[offset:offset + SAVE_SHIP_RECORD_SIZE]
 
-        ship = starship.Starship(ship_id)
+        ship = universe.Starship(ship_id)
 
         ship.set_design(self.parse_ship_design(offset))
         ship.set_owner(lbx.read_byte(data, 0x63))

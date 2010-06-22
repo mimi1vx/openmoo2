@@ -3,18 +3,17 @@ import os
 
 import sys
 import cli
-import gui
+import graphic
 
 import pygame
-#from pygame.locals import *
 
-#import lbx
 import dictionary
-import main_screen
 
-import GameClient
+import networking
 
 import autoplayer
+
+import gui
 
 def show_usage(name, message):
     print
@@ -67,11 +66,9 @@ def main(argv):
     PORT	= OPTIONS['-p']
     PLAYER_ID	= OPTIONS['-player']
 
-    DEBUG = 0
-
     SOCKET_BUFFER_SIZE = 4096
 
-    GUI = gui.Gui(pygame, "sans")
+    GUI = graphic.Gui(pygame)
     GUI.load_lbx_archives(MOO2_DIR)
     if not GUI.check_lbx_archives():
         print("")
@@ -79,12 +76,37 @@ def main(argv):
         print("")
         print("    The OpenMOO2 supports only original LBX files from MOO2 version 1.31")
 
-    CLIENT = GameClient.GameClient(HOST, PORT, SOCKET_BUFFER_SIZE)
+    GUI.init()
+    GUI.load_fonts()
+    GUI.load_raw_palettes()
+    GUI.init_palettes()
+    GUI.load_graphic()
+
+    SCREENS = {
+        'FONTS':            gui.FontsScreen(GUI),
+        'SPLASH':           gui.SplashScreen(GUI),
+        'MAIN':             gui.MainScreen(GUI),
+        'STARSYSTEM':       gui.StarsystemScreen(GUI),
+        'COLONIES':         gui.ColoniesScreen(GUI),
+        'PLANETS':          gui.PlanetsScreen(GUI),
+        'RESEARCH':         gui.ResearchScreen(GUI),
+        'LEADERS':          gui.LeadersScreen(GUI),
+        'COLONY':           gui.ColonyScreen(GUI),
+        'COLONY_BUILD':     gui.ColonyBuildScreen(GUI),
+        'INFO':             gui.InfoScreen(GUI)
+    }
+
+    for screen_key, screen_object in SCREENS.items():
+        screen_object.attach_screens(SCREENS)
+
+    SCREENS['SPLASH'].run()
+
+    CLIENT = networking.Client(HOST, PORT, SOCKET_BUFFER_SIZE)
     CLIENT.connect()
     CLIENT.login(PLAYER_ID)
 
-    server_status = CLIENT.get_server_status()
-    print("# server_status = %s" % str(server_status))
+#    server_status = CLIENT.get_server_status()
+#    print("# server_status = %s" % str(server_status))
 
     # automation for development
 #    scenario = autoplayer.AutoPlayer(CLIENT)
@@ -92,53 +114,37 @@ def main(argv):
 
 #    sys.exit(0)
 
-#    WINDOW_WIDTH    = 640
-#    WINDOW_HEIGHT   = 480
-#    WINDOW_FLAGS	= 0
-#    WINDOW_DEPTH	= 24
     WINDOW_CAPTION  = "OpenMOO2: PLAYER_ID = %s" % PLAYER_ID
 
     pygame.display.set_caption(WINDOW_CAPTION)
-
-    DISPLAY = pygame.display.get_surface()
-
+    
     ICON = pygame.image.load(MOO2_DIR + "/orion2-icon.png")
     pygame.display.set_icon(ICON)
 
-    GUI.load_raw_palettes()
-    GUI.init_palettes()
-
-    PALETTES = GUI.get_palettes()
-    FONTS = GUI.get_fonts()
+#    PALETTES = GUI.get_palettes()
 
     #    print "tested palette after loading: " + str(PALETTES['FONTS_02'])
     #    print
 
-    IMAGES = GUI.get_images()
+#    CLIENT.ping()
 
-    GUI.load_splashscreen()
-    GUI.draw_splashscreen(DISPLAY)
-    pygame.display.flip()
-
-    CLIENT.ping()
-
-    GUI.load_graphic()
+#    GUI.load_graphic()
 
     #	COLONY VIEW
 
     GAME = {
-        'GUI':			GUI,
-        'DISPLAY':		DISPLAY,
-        'PALETTES':		PALETTES,
-        'IMAGES':		IMAGES,
-        'FONTS':		FONTS,
+#        'GUI':			GUI,
+#        'PALETTES':		PALETTES,
+#        'IMAGES':		IMAGES,
         'DICTIONARY':           dictionary.get_dictionary(),
         'TURN':                 0,
         'close_game_menu':	False,
         'client':           	CLIENT
     }
     
-    main_screen.run(GAME)
+    SCREENS['MAIN'].run(GAME)
+
+#    main_screen.run(GAME)
     GAME['client'].disconnect()
 # end func main
 

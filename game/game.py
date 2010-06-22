@@ -1,8 +1,7 @@
 #import os
 
 import moo2
-import star
-import colony
+import universe
 import rules
 
 def stardate(i):
@@ -258,7 +257,7 @@ class Game:
                 stars[star_id] = st
             else:
                 # FIXME: this part returns dict instead of object!
-                stars[star_id] = star.UnexploredStar(star_id, st.get_x(), st.get_y(), st.get_size(), st.get_pict_type(), st.get_class())
+                stars[star_id] = universe.UnexploredStar(star_id, st.get_x(), st.get_y(), st.get_size(), st.get_pict_type(), st.get_class())
         return stars
     # /get_stars_for_player
 
@@ -269,7 +268,7 @@ class Game:
             if col.get_owner() == player_id:
                 colonies[colony_id] = col
             else:
-                colonies[colony_id] = colony.EnemyColony(colony_id, col.get_owner())
+                colonies[colony_id] = universe.EnemyColony(colony_id, col.get_owner())
         return colonies
 
     def get_data_for_player(self, player_id):

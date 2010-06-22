@@ -443,7 +443,10 @@ class Font():
         return self.__glyphs[glyph_id]['width']
 
     def get_glyph_height(self, glyph_id):
-        return self.__glyphs[glyph_id]['height']
+        if glyph_id == 32:
+            return 0
+        else:
+            return self.__glyphs[glyph_id]['height']
 
     def __read_glyph(self, font_file_data, font_id, glyph_id):
         raw_data = self.__read_glyph_data(font_file_data, font_id, glyph_id)

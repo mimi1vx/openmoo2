@@ -1,7 +1,7 @@
 import sys
 
 import cli
-import server
+import networking
 import game
 import rules
 
@@ -45,7 +45,7 @@ def main(argv):
 #    GAME.show_colonies()
 #    GAME.show_ships()
 
-    SERVER = server.Server(LISTEN_ADDR, LISTEN_PORT, GAME)
+    SERVER = networking.Server(LISTEN_ADDR, LISTEN_PORT, GAME)
     SERVER.set_name(GAME_FILE.split("/")[-1])
 
     print("* Run...")

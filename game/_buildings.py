@@ -322,7 +322,7 @@ BUILDINGS = {
       },
 
      48: {
-        'name':     		"Artifical Planet",
+        'name':     		"Artificial Planet",
         'tech':     		16,
       },
 

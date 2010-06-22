@@ -17,7 +17,7 @@ def get_technames():
         "Anti-Missile Rockets",
         "Armor Barracks",
         "Artemis System Net",
-        "Artifical Planet",
+        "Artificial Planet",
         "Assault Shuttles",
         "Astro University",
         "Atmospheric Renewer",

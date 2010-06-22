@@ -100,22 +100,22 @@ RESEARCH_AREAS = {
         'next':		46,
     },
     14:	{
-        'name':		"Artifical Consciousness",
+        'name':		"Artificial Consciousness",
         'cost':		1500,
         'next':		25,
     },
     15:	{
-        'name':		"Artifical Intelligence",
+        'name':		"Artificial Intelligence",
         'cost':		400,
         'next':		60,
     },
     16:	{
-        'name':		"Artifical Gravity",
+        'name':		"Artificial Gravity",
         'cost':		1150,
         'next':		65,
     },
     17:	{
-        'name':		"Artifical Life",
+        'name':		"Artificial Life",
         'cost':		4500,
         'next':		70,
     },
