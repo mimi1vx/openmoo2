@@ -462,7 +462,7 @@ def compose_bc_summary(RULES, colony, PLAYERS):
         summary['spaceport'] = int(summary['taxes_collected'] / 2)
 
     # TODO: Trade Goods ... round the 50% of industry
-    build_queue = colony.build_queue()
+    build_queue = colony.get_build_queue()
 #	print build_queue[0]
 #	print build_queue[1]
 #	print build_queue[2]
@@ -470,7 +470,7 @@ def compose_bc_summary(RULES, colony, PLAYERS):
 #	print build_queue[4]
 #	print build_queue[5]
 #	print build_queue[6]
-    if build_queue[0]['item'] == BUILD_TRADE_GOODS:
+    if build_queue[0]['production_id'] == BUILD_TRADE_GOODS:
         summary['trade_goods'] = int(colony.get_industry() / 2)
 
 

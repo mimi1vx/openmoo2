@@ -111,32 +111,32 @@ class Colony(GameObject):
 
         self.__build_queue = [
             {
-                'item':		lbx.read_char(data,  0x115),
-                'flags':	lbx.read_char(data,  0x116)
+                'production_id':    lbx.read_char(data,  0x115),
+                'flags':            lbx.read_char(data,  0x116)
             },
             {
-                'item':		lbx.read_char(data,  0x117),
-                'flags':	lbx.read_char(data,  0x118)
+                'production_id':    lbx.read_char(data,  0x117),
+                'flags':            lbx.read_char(data,  0x118)
             },
             {
-                'item':		lbx.read_char(data,  0x119),
-                'flags':	lbx.read_char(data,  0x11a)
+                'production_id':    lbx.read_char(data,  0x119),
+                'flags':            lbx.read_char(data,  0x11a)
             },
             {
-                'item':		lbx.read_char(data,  0x11b),
-                'flags':	lbx.read_char(data,  0x11c)
+                'production_id':    lbx.read_char(data,  0x11b),
+                'flags':            lbx.read_char(data,  0x11c)
             },
             {
-                'item':		lbx.read_char(data,  0x11d),
-                'flags':	lbx.read_char(data,  0x11e)
+                'production_id':    lbx.read_char(data,  0x11d),
+                'flags':            lbx.read_char(data,  0x11e)
             },
             {
-                'item':		lbx.read_char(data,  0x11f),
-                'flags':	lbx.read_char(data,  0x120)
+                'production_id':    lbx.read_char(data,  0x11f),
+                'flags':            lbx.read_char(data,  0x120)
             },
             {
-                'item':		lbx.read_char(data,  0x121),
-                'flags':	lbx.read_char(data,  0x122)
+                'production_id':    lbx.read_char(data,  0x121),
+                'flags':            lbx.read_char(data,  0x122)
             }
         ]
 #		0x115		building item #0				# 0x0b = colony base??? 0xf9 = spy? 0xfd = housing 0xfe = trade goods
@@ -346,8 +346,16 @@ class Colony(GameObject):
     def pop_grow(self):
         return self.__pop_grow
 
-    def build_queue(self):
+    def get_build_queue(self):
         return self.__build_queue
+
+    def get_build_item(self):
+        if self.__build_queue[0]['production_id'] == 0xFF:
+            return None
+        elif self.__build_queue[0]['production_id'] == 249:  # repeat
+            return self.__build_queue[1]
+        else:
+            return self.__build_queue[0]
 
     """
         get_agregated_populations
@@ -500,8 +508,6 @@ class Colony(GameObject):
 
 #	    print "	name: %s" % self.name
 #	    print "	owner: %s (%i)" % (PLAYERS[self.get_owner()]['race'], self.get_owner())
-        
-            
 
             """
                 morale

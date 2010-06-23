@@ -6,23 +6,38 @@ from screen import Screen
 
 from _buildings import *
 
-def list_available_buildings(rules_buildings, colony_obj, known_techs):
-    replaced_buildings = []
-    for b_id in colony_obj.list_buildings():
-        if rules_buildings[b_id].has_key("replaces"):
-            print rules_buildings[b_id]['replaces']
-            for rep_b_id in rules_buildings[b_id]['replaces']:
-                replaced_buildings.append(rep_b_id)
+def list_available_production(rules_buildings, colony, known_techs):
+    """returns a dict of production id lists"""
+    replaced = []
+    for production_id in colony.list_buildings():
+        if rules_buildings[production_id].has_key("replaces"):
+            print rules_buildings[production_id]['replaces']
+            for replaces_id in rules_buildings[production_id]['replaces']:
+                replaced.append(replaces_id)
 
-    available_buildings = {}
-    for b_id in rules_buildings:
-        b_rec = rules_buildings[b_id]
-        if b_rec['tech']:
+    available = {'building': [], 'xship': [], 'special': [], 'capitol': []}
+    for production_id, production in rules_buildings.items():
+#        production = rules_buildings[production_id]
+        if production['tech']:
             # knows required technology and not built
-            if (b_rec['tech'] in known_techs) and (not colony_obj.has_building(b_id)) and (not b_id in replaced_buildings):
-                available_buildings[b_id] = b_rec
-    return available_buildings
-# end func list_available_buildings
+            if (production['tech'] in known_techs) and (not colony.has_building(production_id)) and (not production_id in replaced):
+                if production.has_key('type'):
+                    group_id = production['type']
+                else:
+                    group_id = "building"
+#                if not available.has_key(group_id):
+#                    available[group_id] = []
+                available[group_id].append("%s:%i" % (production['name'], production_id))
+    for group_id in available:
+        available[group_id].sort()
+        for i in range(len(available[group_id])):
+#            print(i)
+#            print(available[group_id][i])
+#            print(available[group_id][i].split(":"))
+            available[group_id][i] = int(available[group_id][i].split(":")[1])
+
+    return available
+
 
 class ColonyBuildScreen(Screen):
 
@@ -31,7 +46,7 @@ class ColonyBuildScreen(Screen):
 
     def reset_triggers_list(self):
         Screen.reset_triggers_list(self)
-        self.add_trigger({'action': "ESCAPE",        'rect': pygame.Rect((496, 448), (56, 16))})
+        self.add_trigger({'action': "ESCAPE", 'hover_id': "ESCAPE", 'rect': pygame.Rect((496, 448), (56, 16))})
 
     def draw(self, star, planet, colony):
         GAME = self.__GAME
@@ -46,8 +61,16 @@ class ColonyBuildScreen(Screen):
         ME          = DATA['me']
 
         font3 = self.get_font3()
+        font4 = self.get_font4()
+        font5 = self.get_font5()
 
-        buildings_palette = [0x0, 0x440c00, 0xac542c]
+        production_palette = [0x0, 0x440c00, 0xac542c]
+        xship_palette = [0x0, 0x802810, 0xe48820, 0xe46824]
+        build_queue_palette = [0x0, 0x802810, 0xe48820]
+
+        light_text_palette = [0x0, 0x802810, 0xe48820, 0xe46824]
+        dark_text_palette = [0x0, 0x440c00, 0xac542c]
+
 
         DISPLAY.blit(self.get_image('background', 'starfield'), (0, 0))
 #        colony_screen.draw_planet_background(GUI, DISPLAY, IMAGES, PALETTES, planet.get_terrain(), planet.get_picture())
@@ -58,7 +81,7 @@ class ColonyBuildScreen(Screen):
     #    shadow.fill((0, 0, 0))
     #    shadow.fill((8, 8, 20))
         shadow.fill((28, 32, 44))
-        shadow.set_alpha(180)
+        shadow.set_alpha(128)
         DISPLAY.blit(shadow, (0, 0))
 
     #    c1 = (0, 0, 0, 128)
@@ -76,26 +99,90 @@ class ColonyBuildScreen(Screen):
 
     #    buildings = colony.list_buildings()
         print("")
-        print("=== Available Buildings: ===")
-        available_buildings = list_available_buildings(RULES['buildings'], colony, ME.get_known_techs())
+        print("=== Available Production: ===")
+        available_production = list_available_production(RULES['buildings'], colony, ME.get_known_techs())
 
-        av_b_sorted = []
-        for building_id, building in available_buildings.items():
-            av_b_sorted.append("%s:%i" % (building['name'], building_id))
-        av_b_sorted.sort()
+        # hack Trade Goods to the first position in list
+        if 254 in available_production['building']:
+            i = available_production['building'].index(254)
+            available_production['building'].pop(i)
+        available_production['building'].insert(0, 254)
+
+        # hack Housing to the second position in list
+        if 253 in available_production['building']:
+            i = available_production['building'].index(253)
+            available_production['building'].pop(i)
+        available_production['building'].insert(1, 253)
+
+        # hack Freighter Fleet to the first position in list
+        if 214 in available_production['xship']:
+            i = available_production['xship'].index(214)
+            available_production['xship'].pop(i)
+            available_production['xship'].insert(0, 214)
+
+        print(available_production)
 
         y = 20
 #        for building_id, building in available_buildings.items():
 	# limit listing to 25 items here, overflow causes crash on Solaris, Python 2.6.5, Pygame 1.8.1
-        for bld in av_b_sorted[:25]:
-            bld = bld.split(":")
-            building_name = bld[0]
-            building_id = int(bld[1])
-            print(building_id, building_name)
-            font3.write_text(DISPLAY, 13, y, building_name, buildings_palette, 2)
+        for production_id in available_production['building'][:25]:
+            print("production_id = %i" % production_id)
+            production_name = RULES['buildings'][production_id]['name']
+            print(production_id, production_name)
+            font3.write_text(DISPLAY, 13, y, production_name, dark_text_palette, 2)
+            hover_id = "production:%i" % production_id
+            self.add_trigger({'action': "production", 'production_id': production_id, 'hover_id': hover_id, 'rect': pygame.Rect((13, y), (170, 12))})
             y += 18
         print("=== /Available Buildings ===")
         print("")
+
+        # xships = Freighter Fleet, Colony Ship, Outpost Ship and Transport Ship
+        y = 20
+        for production_id in available_production['xship']:
+            print("production_id = %i" % production_id)
+            production_name = RULES['buildings'][production_id]['name']
+            print(production_id, production_name)
+            font5.write_text(DISPLAY, 485, y, production_name, light_text_palette, 2)
+            hover_id = "production:%i" % production_id
+            self.add_trigger({'action': "production", 'production_id': production_id, 'hover_id': hover_id, 'rect': pygame.Rect((485, y), (143, 15))})
+            y += 19
+
+        print("=== Build Queue ===")
+        build_queue = colony.get_build_queue()
+        print(build_queue)
+
+        label = font4.render("Build List for %s" % colony.get_name(), light_text_palette, 2)
+        DISPLAY.blit(label, (240, 311))
+
+        y = 334
+        i = 0
+        repeat = False
+        for build_item in build_queue:
+            production_id = build_item['production_id']
+            if production_id < 0xFF:
+                if RULES['buildings'][production_id].has_key('type') and RULES['buildings'][production_id]['type'] == "repeat":
+                    repeat = True
+                    continue
+
+                production_name = RULES['buildings'][production_id]['name']
+                label = font4.render(production_name, light_text_palette, 2)
+                xx = (250 - label.get_width()) / 2
+                DISPLAY.blit(label, (208 + xx, y))
+                hover_id = "queue:%i" % i
+                if repeat:
+                    self.add_trigger({'action': "delete_repeat_production", 'item': i, 'hover_id': hover_id, 'rect': pygame.Rect((208, y - 1), (250, 15))})
+                    y += 20
+                    label = font4.render("^ Repeat ^", light_text_palette, 2)
+                    xx = (250 - label.get_width()) / 2
+                    DISPLAY.blit(label, (208 + xx, y))
+                    self.add_trigger({'action': "delete_repeat_production", 'item': i, 'hover_id': hover_id, 'rect': pygame.Rect((208, y - 1), (250, 15))})
+                    repeat = False
+                else:
+                    self.add_trigger({'action': "delete_production", 'item': i, 'hover_id': hover_id, 'rect': pygame.Rect((208, y - 1), (250, 15))})
+                y += 20
+            i += 1
+
+        print("=== /Build Queue ===")
 
         self.flip()
         return
@@ -113,8 +200,6 @@ class ColonyBuildScreen(Screen):
             DISPLAY.blit(label_surface, (484, 110 + yy))
         print("=== /Prototypes ===")
         print("")
-
-
 
         build_queue = colony.build_queue()
         yy = 0
@@ -175,3 +260,6 @@ class ColonyBuildScreen(Screen):
 
                 if action == "ESCAPE":
                     return
+
+                if action == "hover":
+                    print("hover = %s" % event['hover'])

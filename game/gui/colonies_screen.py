@@ -23,9 +23,15 @@ class ColoniesScreen(Screen):
         COLONIES    = GAME['DATA']['colonies']
         ME          = GAME['DATA']['me']
 
+        DATA        = GAME['DATA']
+        RULES       = DATA['rules']
+
         DISPLAY = self.get_display()
 
         DISPLAY.blit(self.get_image('colonies_screen', 'panel'), (0, 0))
+
+        font2 = self.get_font2()
+        font3 = self.get_font3()
 
         my_colonies = []
 
@@ -42,8 +48,6 @@ class ColoniesScreen(Screen):
 
         self.__list_size = len(my_colonies)
 
-        font3 = self.get_font('font3')
-
         for i in range(self.__list_start, min(self.__list_size, self.__list_start + self.__view_size)):
             colony = my_colonies[i]
             colony_id	= colony.get_id()
@@ -56,6 +60,14 @@ class ColoniesScreen(Screen):
             y = 38 + (31 * (i - self.__list_start))
 
             self.add_trigger({'action': "colony", 'colony_id': colony_id, 'rect': pygame.Rect((12, y), (85, 24))})
+
+            # production
+            build_item = colony.get_build_item()
+            if build_item:
+                production_id = build_item['production_id']
+                production_name = RULES['buildings'][production_id]['name']
+                font2.write_text(DISPLAY, 512, y, production_name, [0x0, 0x141420, 0x6c688c], 1)
+
             self.add_trigger({'action': "colony_build", 'colony_id': colony_id, 'rect': pygame.Rect((513, y), (85, 24))})
 
 #            DISPLAY.blit(FONTS['font_10'].render(colony.get_name(), 1, (0x80, 0xA0, 0xBC)), (12, y + 6))

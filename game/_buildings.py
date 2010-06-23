@@ -109,6 +109,7 @@ BUILDINGS = {
       9: {
         'name':     		"Capitol",
         'tech':     		32,
+        'type':                 "capitol"
       },
 
      10: {
@@ -119,6 +120,7 @@ BUILDINGS = {
      11: {
         'name':     		"Colony Base",
         'tech':     		40,
+        'type':                 "special"
       },
 
      12: {
@@ -387,28 +389,77 @@ BUILDINGS = {
       },
 
     141: {
-        'name':     		"Transport",
+        'name':     		"Transport Ship",
         'tech':     		189,
+        'type':                 "xship"
       },
 
     142: {
         'name':     		"Outpost Ship",
         'tech':     		109,
+        'type':                 "xship"
       },
 
     143: {
         'name':     		"Colony Ship",
         'tech':     		41,
+        'type':                 "xship"
+      },
+
+    144: {
+        'name':     		"ship design # 4",
+        'tech':     		0,
+      },
+
+    145: {
+        'name':     		"ship design # 3",
+        'tech':     		0,
+      },
+
+    146: {
+        'name':     		"? production_id 146 ?",
+        'tech':     		0,
+      },
+
+    147: {
+        'name':     		"ship design # 2",
+        'tech':     		0,
+      },
+
+    148: {
+        'name':     		"ship design # 1",
+        'tech':     		0,
+      },
+
+    149: {
+        'name':     		"? production_id 149 ?",
+        'tech':     		0,
+      },
+
+    150: {
+        'name':     		"ship design # 0",
+        'tech':     		0,
+      },
+
+    151: {
+        'name':     		"? production_id 151 ?",
+        'tech':     		0,
+      },
+
+    152: {
+        'name':     		"? production_id 152 ?",
+        'tech':     		0,
       },
 
     153: {
-        'name':     		"? BUILDING 153 ?",
+        'name':     		"ship design # X",
         'tech':     		0,
       },
 
     214: {
         'name':     		"Freighter Fleet",
         'tech':     		69,
+        'type':                 "xship"
       },
 
     241: {
@@ -419,21 +470,24 @@ BUILDINGS = {
     246: {
         'name':     		"Spy",
         'tech':     		166,
+        'type':                 "special"
       },
 
     249: {
-        'name':     		"Repeat",
+        'name':     		"^ Repeat ^",
         'tech':     		0,
-        'extra':    		'repeat'
+        'type':    		"repeat"
       },
 
     253: {
         'name':     		"Housing",
         'tech':     		0,
+        'type':                 "housing"
       },
 
     254: {
         'name':     		"Trade Goods",
         'tech':     		0,
+        'type':                 "trade"
       },
 }
