@@ -186,19 +186,12 @@ class ColonyScreen(Screen):
         star_id	= planet.get_star()
         star	= DATA['stars'][star_id]
 
-    #    print "colony_screen::run() ... buildings = %s" % colony.buildings
-        print "colony_screen::run() ... colony.build_queue[] = %s" % colony.build_queue()[0]
-        print "colony_screen::run() ... colony.build_queue[] = %s" % colony.build_queue()[1]
-        print "colony_screen::run() ... colony.build_queue[] = %s" % colony.build_queue()[2]
-        print "colony_screen::run() ... colony.build_queue[] = %s" % colony.build_queue()[3]
-        print "colony_screen::run() ... colony.build_queue[] = %s" % colony.build_queue()[4]
-        print "colony_screen::run() ... colony.build_queue[] = %s" % colony.build_queue()[5]
-        print "colony_screen::run() ... colony.build_queue[] = %s" % colony.build_queue()[6]
+        for build_item in colony.get_build_queue():
+            print "colony_screen::run() ... colony.build_queue[] = %s" % build_item
 
     #    colony.recount(RULES, PLAYERS)
 
     #    draw(GAME, planet['terrain'], planet['picture'], "%s %i" % (star['name'], planet['position']))
-
 
         self.draw(star, planet, colony)
 
