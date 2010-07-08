@@ -2,12 +2,12 @@ import socket
 import pickle
 import time
 
-
 class GameSocket():
 
     def __init__(self, socket):
         self.__socket = socket
         self.set_buffer_size(4096)
+        self.__head_size = 64
 #        self.set_buffer_size(65536)
 #        self.set_buffer_size(131072)
 #        self.set_buffer_size(262144)
@@ -48,50 +48,39 @@ class GameSocket():
     def close(self):
         self.__socket.close()
 
-    def recv(self):
-        data = "";
-        chunks = 0;
-        while 1:
+    def __recv_raw(self, data_size):
+        data = ""
+        buffer_size = self.get_buffer_size()
+        while data_size:
             try:
-                s = self.__socket.recv(self.get_buffer_size())
-                l = len(s)
-#                print("GameSocket::recv() ... received %i bytes chunk" % l)
-#                s = self.clientSocket.recv(SOCKET_BUFFER_SIZE)
+                chunk = self.__socket.recv(min(buffer_size, data_size))
             except socket.timeout:
-#                print("Game_client::recv ... self.clientSocket.recv > timeout")
-                s = None
-            if not s:
+                chunk = ""
+            if not chunk:
                 break
-            data += s
-            chunks += 1
-#        print("Received from server: " + data)
-        l = len(data)
-#        print("GameSocket::recv() ... %i chunks received" % chunks)
-#        print("GameSocket::recv() ... %i bytes received" % l)
-        if not l:
-#            print("! ERROR: GameSocket::recv() ... returning None?")
+            data += chunk
+            data_size -= len(chunk)
+        return data
+
+    def recv(self):
+        head_raw = self.__recv_raw(self.__head_size).rstrip()
+        # return None if header is empty
+        if not head_raw:
             return None
-        else:
-            return pickle.loads(data)
-#        return data
-    # /recv
-#        data = self.__socket.recv(self.get_buffer_size())
-#        if not data:
-#            return None
-#        else:
-#            return pickle.loads(data)
+        head = pickle.loads(head_raw)
+        return pickle.loads(self.__recv_raw(head['data_size']))
+
+    def __compose_head(self, data_size):
+        return pickle.dumps({
+            'data_size':    data_size
+        }).ljust(self.__head_size)
 
     def send(self, data):
-#	data = "DATA ... "  + pickle.dumps(data)
         data = pickle.dumps(data)
-#        return self.__socket.sendall(data)
-        size = len(data)
+        head = self.__compose_head(len(data))
+        data = head + data
+        total_size = len(data)
         sent = 0
-        print("# GameSocket::send() ... sending %i bytes" % (size))
-        while sent < size:
+        while sent < total_size:
             chunk_size = self.__socket.send(data[sent:])
             sent = sent + chunk_size
-            print("# GameSocket::send() ... %i bytes chunk sent (total %i / %i)" % (chunk_size, sent, size))
-#        time.sleep(1)
-        time.sleep(self.gettimeout())
-        
