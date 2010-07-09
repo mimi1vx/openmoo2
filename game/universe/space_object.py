@@ -13,3 +13,6 @@ class SpaceObject(GameObject):
 
     def get_y(self):
         return self.__y
+
+    def get_coords(self):
+        return (self.__x, self.__y)
