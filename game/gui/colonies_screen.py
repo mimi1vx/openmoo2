@@ -131,6 +131,3 @@ class ColoniesScreen(Screen):
                 elif action == "colony_build":
                     self.get_screen('COLONY_BUILD').run(GAME, event['colony_id'])
                     self.draw()
-
-                else:
-                    self.log_info("gui_main_screen::run() ... UNKNONW event: %s" % event)

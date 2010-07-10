@@ -7,8 +7,16 @@ class StarsystemScreen(Screen):
 
     def __init__(self, ui):
         self.__panel_x, self.__panel_y = 106, 103
-        self.__panel_x, self.__panel_y = 22, 22
+
+        self.__panel_x_min = 22
+        self.__panel_x_max = 180
+        self.__panel_y_min = 22
+        self.__panel_y_max = 148
+
         Screen.__init__(self, ui)
+
+    def get_normalized_panel_pos(self, (x, y)):
+        return (min(max(x, self.__panel_x_min), self.__panel_x_max), min(max(y, self.__panel_y_min), self.__panel_y_max))
 
     def draw_planet_info(self, text_rows):
         DISPLAY = self.get_display()
@@ -49,11 +57,12 @@ class StarsystemScreen(Screen):
 
         self.reset_triggers_list()
 
-        X = min(max(self.__panel_x, 21), 181)
-        Y = min(max(self.__panel_y, 22), 148)
+        X, Y = self.get_normalized_panel_pos((self.__panel_x, self.__panel_y))
 
         self.add_trigger({'action': "ESCAPE", 'hover_id': "escape_button", 'rect': pygame.Rect((X + 264, Y + 239), (64, 19))})
-#        self.add_trigger({'action': "drag", 'rect': pygame.Rect((X + 14, Y + 12), (319, 26))})
+        self.add_trigger({'action': "drag", 'rect': pygame.Rect((X + 14, Y + 12), (319, 26))})
+
+        DISPLAY.blit(self.__BACKGROUND, (0, 0))
 
         # dialog window
         DISPLAY.blit(self.get_image('starsystem_map', 'panel'), (X, Y))
@@ -90,8 +99,6 @@ class StarsystemScreen(Screen):
                 if planet_id != 0xffff:
                     planet = DATA['planets'][planet_id]
 
-#                    x = X + 30 + (60 * i)
-#                    y = Y + 180
                     x = X + 200 + (25 * i) + (5 - planet.get_size())
                     y = Y + 121 + (5 - planet.get_size())
                     hover_id = "planet_%i" % planet_id
@@ -158,7 +165,7 @@ class StarsystemScreen(Screen):
 
         hover = None
 
-        self.draw(star_id, hover)
+        self.__BACKGROUND = self.get_display().copy()
 
         drag = False
         mouse_rel_x, mouse_rel_y = 0, 0
@@ -168,26 +175,28 @@ class StarsystemScreen(Screen):
             if event:
                 action = event['action']
 
-#                if action == "left_mouse_up" and drag:
-#                    drag = False
-#                    print("Panel dropped")
-#
-#                elif action == "drag":
-#                    drag = True
-#                    mouse_rel_x = event['mouse_pos'][0] - self.__panel_x
-#                    mouse_rel_y = event['mouse_pos'][1] - self.__panel_y
-#                    print("Panel dragged")
+                if action == "redraw":
+                    self.draw(star_id, hover)
 
-                if action == "hover":
+                elif action == "left_mouse_up" and drag:
+                    drag = False
+                    self.__panel_x, self.__panel_y = self.get_norlalized_panel_pos((self.__panel_x, self.__panel_y))
+                    print("Panel dropped")
+
+                elif action == "drag":
+                    drag = True
+                    mouse_rel_x = event['mouse_pos'][0] - self.__panel_x
+                    mouse_rel_y = event['mouse_pos'][1] - self.__panel_y
+                    print("Panel dragged")
+
+                elif action == "hover":
                     if hover != event['hover']:
                         hover = event['hover']
-                        self.draw(star_id, hover)
-#                elif action == "hover" or action == "MOUSEMOTION":
-#                    if drag:
-#                        print(event)
-#                        self.__panel_x = event['mouse_pos'][0] - mouse_rel_x
-#                        self.__panel_y = event['mouse_pos'][1] - mouse_rel_y
-#                        self.draw(star_id, hover)
+
+                if (action == "hover") or (action == "MOUSEMOTION"):
+                    if drag:
+                        self.__panel_x = event['mouse_pos'][0] - mouse_rel_x
+                        self.__panel_y = event['mouse_pos'][1] - mouse_rel_y
                 
                 elif action == "ESCAPE":
                     return
@@ -196,6 +205,3 @@ class StarsystemScreen(Screen):
                     self.get_screen('COLONY').run(GAME, event['colony_id'])
                     self.get_screen('MAIN').draw()
                     self.draw(star_id, hover)
-
-                else:
-                    print "UNKNONW ACTION: " + action

@@ -192,9 +192,6 @@ class LeadersScreen(Screen):
                 if action == "ESCAPE":
                     break
 
-                elif action == "hover":
-                    pass
-
                 elif (action == "showColonyLeaders") and (self.__type == 0):
                     self.__type = 1
                     self.draw()
@@ -202,6 +199,3 @@ class LeadersScreen(Screen):
                 elif (action == "showShipOfficers") and (self.__type == 1):
                     self.__type = 0
                     self.draw()
-
-                else:
-                    self.log_info("gui_main_screen::run() ... UNKNONW event: %s" % event)

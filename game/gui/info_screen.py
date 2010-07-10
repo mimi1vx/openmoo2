@@ -88,9 +88,3 @@ class InfoScreen(Screen):
 
                 if action == "ESCAPE":
                     return
-
-                elif action == "hover":
-                    pass
-
-                else:
-                    print "UNKNONW ACTION: " + action

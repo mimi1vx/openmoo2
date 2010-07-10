@@ -30,6 +30,3 @@ class PlanetsScreen(Screen):
 
                 if action == "ESCAPE":
                     return
-
-                else:
-                    pass

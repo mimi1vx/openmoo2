@@ -10,6 +10,8 @@ MOUSE_WHEELDOWN		= 5
 
 class Window():
 
+    __redraw_event = pygame.USEREVENT + 1
+
     def __init__(self, ui):
 #        print("@ @ @ gui_window::Window::__init__()")
         self.set_ui(ui)
@@ -50,6 +52,8 @@ class Window():
         self.__triggers = []
 
     def add_trigger(self, trigger):
+        if not trigger.has_key('hover_id'):
+            trigger['hover_id'] = None
         self.__triggers.append(trigger)
 
     def get_triggers_list(self):
@@ -58,21 +62,30 @@ class Window():
     def get_trigger(self, trigger_id):
         return self.__triggers[trigger_id]
 
+    def redraw_event_id(self):
+        return self.__redraw_event
+
+    def get_timestamp(self, zoom = 1):
+        return int(time.time() * zoom)
+
     def get_event(self):
         event = pygame.event.wait()
 
-        if (event.type == QUIT):
+        if event.type == self.redraw_event_id():
+            return {'action': "redraw"}
+
+        elif event.type == QUIT:
             return {'action': "QUIT"}
 
-        elif (event.type == KEYDOWN):
-            if (event.key == K_ESCAPE):
+        elif event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
                 return {'action': "ESCAPE"}
             else:
                 return {'action': "key", 'key': event.key}
 
-#        elif event.type == MOUSEBUTTONUP:
-#            if event.button == MOUSE_LEFT_BUTTON:
-#                return {'action': "left_mouse_up"}
+        elif event.type == MOUSEBUTTONUP:
+            if event.button == MOUSE_LEFT_BUTTON:
+                return {'action': "left_mouse_up"}
 
         elif event.type == MOUSEBUTTONDOWN:
 
@@ -105,6 +118,6 @@ class Window():
                     return {'action': "hover", 'hover': trigger, 'mouse_pos': (tmpX, tmpY)}
 
             # MOUSEMOTION will be implemented later (windows dragging...)
-#            return {'action': "MOUSEMOTION", 'mouse_pos': (tmpX, tmpY)}
+            return {'action': "MOUSEMOTION", 'mouse_pos': (tmpX, tmpY)}
 
         return None

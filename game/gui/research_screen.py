@@ -88,6 +88,3 @@ class ResearchScreen(Screen):
                     GAME['DATA'] = GAME['client'].set_research(tech_id)
                     GAME['DATA']['me'].print_research_debug()
                     return
-
-                else:
-                    self.log_info("gui_main_screen::run() ... UNKNONW event: %s" % event)

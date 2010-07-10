@@ -221,9 +221,3 @@ class ColonyScreen(Screen):
                 elif action == "change_build":
                     self.get_screen('COLONY_BUILD').run(GAME, event['colony_id'])
                     self.draw(star, planet, colony)
-
-                elif action == "hover":
-                    pass
-
-                else:
-                    print "UNKNONW ACTION: " + action

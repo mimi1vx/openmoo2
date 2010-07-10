@@ -170,11 +170,24 @@ class MainScreen(Screen):
         self.prepare_ships()
         self.prepare_stars()
 
+        ship_tracks_bitmaps = (
+            [0x001400, 0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804],
+            [0x043804, 0x001400, 0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008],
+            [0x087008, 0x043804, 0x001400, 0x001400, 0x043804, 0x087008, 0x489038, 0x489038],
+            [0x489038, 0x087008, 0x043804, 0x001400, 0x001400, 0x043804, 0x087008, 0x489038],
+            [0x489038, 0x489038, 0x087008, 0x043804, 0x001400, 0x001400, 0x043804, 0x087008],
+            [0x087008, 0x489038, 0x489038, 0x087008, 0x043804, 0x001400, 0x001400, 0x043804],
+            [0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804, 0x001400, 0x001400],
+            [0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804, 0x001400]
+        )
+
+        ts = self.get_timestamp(20)
+
         for wormhole in self.__map_items['wormholes']:
             pygame_ext.draw_line(DISPLAY, wormhole['pos1'], wormhole['pos2'], [0x444444])
 
         for ship_track in self.__map_items['ship_tracks']:
-            pygame_ext.draw_line(DISPLAY, ship_track['pos1'], ship_track['pos2'], [0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804, 0x001400])
+            pygame_ext.draw_line(DISPLAY, ship_track['pos1'], ship_track['pos2'], ship_tracks_bitmaps[ts % 8])
 
         for star in self.__map_items['stars']:
             DISPLAY.blit(star['img'], star['pos1'])
@@ -221,7 +234,7 @@ class MainScreen(Screen):
         else:
             self.__zoom_level = 0
 
-        self.draw()
+        pygame.time.set_timer(self.redraw_event_id(), 50)
 
         while True:
             event = self.get_event()
@@ -230,6 +243,9 @@ class MainScreen(Screen):
 
                 if action == "QUIT":
                     break
+
+                elif action == "redraw":
+                    self.draw()
 
 		elif action == "newTurn":
 		#           print("=> newTurn ... DATA.keys = %s" % GAME['DATA'].keys()) 
@@ -272,9 +288,3 @@ class MainScreen(Screen):
                 elif action == "show_star_system":
                     self.get_screen('STARSYSTEM').run(GAME, event['star_id'])
                     self.draw()
-
-                elif action == "hover":
-                    pass
-
-                else:
-                    self.log_info("gui_main_screen::run() ... UNKNONW event: %s" % event)
