@@ -22,7 +22,9 @@ class StarsystemScreen(Screen):
         DISPLAY = self.get_display()
         font3 = self.get_font3()
         info_palette = [0x0, 0x181c40, 0x688cb0]
-        info_x, info_y = self.__panel_x + 15, self.__panel_y + 49
+        info_x, info_y = self.get_normalized_panel_pos((self.__panel_x, self.__panel_y))
+        info_x += 15
+        info_y += 49
         rows = []
         width, height = 0, 6
         for text_line in text_rows:
@@ -180,7 +182,7 @@ class StarsystemScreen(Screen):
 
                 elif action == "left_mouse_up" and drag:
                     drag = False
-                    self.__panel_x, self.__panel_y = self.get_norlalized_panel_pos((self.__panel_x, self.__panel_y))
+                    self.__panel_x, self.__panel_y = self.get_normalized_panel_pos((self.__panel_x, self.__panel_y))
                     print("Panel dropped")
 
                 elif action == "drag":
