@@ -11,6 +11,7 @@ class Screen(window.Window):
             if trigger.has_key('rect'):
 #                pygame.draw.rect(self.get_display(), 0xdab1e1, trigger['rect'], 1)
                 pass
+        self.force_draw_mouse_cursor()
         self.get_ui().flip()
 
     def attach_screens(self, screens):

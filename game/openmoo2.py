@@ -82,6 +82,9 @@ def main(argv):
     GUI.init_palettes()
     GUI.load_graphic()
 
+    pygame.mouse.set_visible(False)
+    gui.Input().set_display(pygame.display.get_surface())
+
     SCREENS = {
         'FONTS':            gui.FontsScreen(GUI),
         'SPLASH':           gui.SplashScreen(GUI),
@@ -141,7 +144,7 @@ def main(argv):
         'close_game_menu':	False,
         'client':           	CLIENT
     }
-    
+
     SCREENS['MAIN'].run(GAME)
 
 #    main_screen.run(GAME)

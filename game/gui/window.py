@@ -1,21 +1,14 @@
 import time
 import pygame
-from pygame.locals import *
 
-MOUSE_LEFT_BUTTON       = 1
-MOUSE_MIDDLE_BUTTON     = 2
-MOUSE_RIGHT_BUTTON      = 3
-MOUSE_WHEELUP		= 4
-MOUSE_WHEELDOWN		= 5
+import input
 
 class Window():
 
-    __redraw_event = pygame.USEREVENT + 1
-
     def __init__(self, ui):
-#        print("@ @ @ gui_window::Window::__init__()")
         self.set_ui(ui)
         self.reset_triggers_list()
+        self.__input = input.Input()
 
     def log_info(self, message):
         ts = int(time.time())
@@ -45,9 +38,6 @@ class Window():
     def get_font(self, font_id):
         return self.__ui.get_font(font_id)
 
-#    def load_image(self, lbx_key, picture_id, picture_frame, palette_key, color_key):
-#        return self.get_ui().load_image(lbx_key, picture_id, picture_frame, palette_key, color_key)
-
     def reset_triggers_list(self):
         self.__triggers = []
 
@@ -68,56 +58,20 @@ class Window():
     def get_timestamp(self, zoom = 1):
         return int(time.time() * zoom)
 
+    def set_redraw_mouse_timer(self, timing):
+        pygame.time.set_timer(self.__input.redraw_mouse_event(), timing)
+
+    def set_redraw_screen_timer(self, timing):
+        pygame.time.set_timer(self.__input.redraw_screen_event(), timing)
+
+    def set_mouse_cursor(self, surface):
+        self.__input.set_mouse_cursor(surface)
+
+    def redraw_mouse_cursor(self):
+        self.__input.draw_mouse_cursor()
+
+    def force_draw_mouse_cursor(self):
+        self.__input.force_draw_mouse_cursor()
+
     def get_event(self):
-        event = pygame.event.wait()
-
-        if event.type == self.redraw_event_id():
-            return {'action': "redraw"}
-
-        elif event.type == QUIT:
-            return {'action': "QUIT"}
-
-        elif event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
-                return {'action': "ESCAPE"}
-            else:
-                return {'action': "key", 'key': event.key}
-
-        elif event.type == MOUSEBUTTONUP:
-            if event.button == MOUSE_LEFT_BUTTON:
-                return {'action': "left_mouse_up"}
-
-        elif event.type == MOUSEBUTTONDOWN:
-
-            if event.button == MOUSE_MIDDLE_BUTTON:
-                print event
-
-            elif event.button == MOUSE_WHEELUP:
-                return {'action': "SCROLL_UP"}
-
-            elif event.button == MOUSE_WHEELDOWN:
-                return {'action': "SCROLL_DOWN"}
-
-            else:
-                tmpX, tmpY = event.pos[0], event.pos[1]
-
-                for trigger in self.get_triggers_list():
-                    if trigger['rect'].collidepoint(event.pos):
-
-                        if event.button == MOUSE_LEFT_BUTTON:
-                            trigger['mouse_pos'] = (tmpX, tmpY)
-                            return trigger
-
-                        elif event.button == MOUSE_RIGHT_BUTTON:
-                            return {'action': "help", 'help': trigger['action']}
-
-        elif event.type == MOUSEMOTION:
-            tmpX, tmpY = event.pos[0], event.pos[1]
-            for trigger in self.get_triggers_list():
-                if trigger['rect'].collidepoint(event.pos):
-                    return {'action': "hover", 'hover': trigger, 'mouse_pos': (tmpX, tmpY)}
-
-            # MOUSEMOTION will be implemented later (windows dragging...)
-            return {'action': "MOUSEMOTION", 'mouse_pos': (tmpX, tmpY)}
-
-        return None
+        return self.__input.get_event(self.get_triggers_list())

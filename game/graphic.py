@@ -27,6 +27,7 @@ class Gui():
             'COLPUPS.LBX':      lbx.Archive("%s/COLPUPS.LBX" % moo2_dir, "2ecad5faf06c64afb8124b162d21b253"),
             'COLSUM.LBX':       lbx.Archive("%s/COLSUM.LBX" % moo2_dir, "cb9be56155b2304abb92613ca5549980"),
             'COLSYSDI.LBX':     lbx.Archive("%s/COLSYSDI.LBX" % moo2_dir, "d2ad38fc93b6876246868b880acd7ec9"),
+            'DIPLOMAT.LBX':     lbx.Archive("%s/DIPLOMAT.LBX" % moo2_dir, "1e8c0a90e8836d9cc83e4614ece8011d"),
             'FONTS.LBX':        lbx.Archive("%s/FONTS.LBX" % moo2_dir, "51002fdf406bac511f649fff9c1f531c"),
             'GAME.LBX':         lbx.Archive("%s/GAME.LBX" % moo2_dir, "6ac9233d3c0221c2a01c24e7e995de63"),
             'IFONTS.LBX':       lbx.Archive("%s/IFONTS.LBX" % moo2_dir, "deb8a07d2446b725810904d1d73def87"),
@@ -333,3 +334,5 @@ class Gui():
             else:
                 IMAGES['APP_PICS'][i] = None
         """
+
+        self.load_transparent_image('DIPLOMAT.LBX', 0, 'COLONY2.LBX', 0x00, 'mouse_cursor', 'default')

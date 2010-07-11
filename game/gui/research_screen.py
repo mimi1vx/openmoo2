@@ -54,8 +54,6 @@ class ResearchScreen(Screen):
                     write_color = color
 
                 label = font4.render(RULES['tech_table'][tech_id]['name'], [0x0, 0x181818, write_color], 2)
-#                l_w = label.get_width()
-#                l_h = 10
 
                 yy = i * 15
                 DISPLAY.blit(label, (x, y + yy))
@@ -76,10 +74,12 @@ class ResearchScreen(Screen):
                 if action == "ESCAPE":
                     return
 
+                elif action == "redraw":
+                    self.draw(hover)
+
                 elif action == "hover":
                     if hover != event['hover']:
                         hover = event['hover']
-                        self.draw(hover)
 
                 elif action == "set_research":
                     tech_id = event['tech_id']

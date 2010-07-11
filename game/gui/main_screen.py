@@ -234,7 +234,10 @@ class MainScreen(Screen):
         else:
             self.__zoom_level = 0
 
-        pygame.time.set_timer(self.redraw_event_id(), 50)
+        self.draw()
+        self.set_redraw_screen_timer(50)
+
+        self.set_mouse_cursor(self.get_image('mouse_cursor', 'default'))
 
         while True:
             event = self.get_event()
