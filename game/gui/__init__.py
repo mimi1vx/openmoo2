@@ -12,3 +12,5 @@ from colony_build_screen import ColonyBuildScreen
 from info_screen import InfoScreen
 
 from fonts_screen import FontsScreen
+
+from input import Input
