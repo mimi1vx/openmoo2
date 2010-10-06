@@ -177,6 +177,6 @@ class UnexploredStar(Star):
     def visited(self):
         return False
 
-    def visited_by_player(self):
+    def visited_by_player(self, player_id):
         return False
     
