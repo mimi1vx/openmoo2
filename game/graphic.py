@@ -38,7 +38,8 @@ class Gui():
             'PLNTSUM.LBX':      lbx.Archive("%s/PLNTSUM.LBX" % moo2_dir, "37465fb75f1864fa750f3163acfe6261"),
             'RACEICON.LBX':	lbx.Archive("%s/RACEICON.LBX" % moo2_dir, "db068efad10498daeb38c48b5425f681"),
             'SR_R9_SC.LBX':     lbx.Archive("%s/SR_R9_SC.LBX" % moo2_dir, "07e1d2361881c5373c71ee4a29a0a267"),
-            'TECHSEL.LBX':      lbx.Archive("%s/TECHSEL.LBX" % moo2_dir, "db472e2a7f8185536a21db6e9c73a7a5")
+            'TECHSEL.LBX':      lbx.Archive("%s/TECHSEL.LBX" % moo2_dir, "db472e2a7f8185536a21db6e9c73a7a5"),
+            'TEXTBOX.LBX':      lbx.Archive("%s/TEXTBOX.LBX" % moo2_dir, "5f50e2cbdcbe89ad084be2024477f9c5")
         }
     # /load_lbx_archives
 
@@ -336,3 +337,9 @@ class Gui():
         """
 
         self.load_transparent_image('DIPLOMAT.LBX', 0, 'COLONY2.LBX', 0x00, 'mouse_cursor', 'default')
+        
+        self.load_solid_image('TEXTBOX.LBX', 0, 'BUFFER0.LBX', 'text_box', 'top');
+        self.load_solid_image('TEXTBOX.LBX', 1, 'BUFFER0.LBX', 'text_box', 'middle');
+        self.load_solid_image('TEXTBOX.LBX', 2, 'BUFFER0.LBX', 'text_box', 'bottom');
+
+       

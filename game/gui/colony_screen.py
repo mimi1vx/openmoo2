@@ -171,12 +171,10 @@ class ColonyScreen(Screen):
     #    draw(GAME)
         self.__GAME = GAME
         DATA	= GAME['DATA']
-    #    RULES       = DATA['rules']
-    #    PLAYERS     = DATA['players']
+
 
         print
         print "@@@ colony_screen @@@"
-    #    print "     planet_id: %i" % planet_id
 
         colony      = DATA['colonies'][colony_id]
 
@@ -189,35 +187,45 @@ class ColonyScreen(Screen):
         for build_item in colony.get_build_queue():
             print "colony_screen::run() ... colony.build_queue[] = %s" % build_item
 
-    #    colony.recount(RULES, PLAYERS)
-
-    #    draw(GAME, planet['terrain'], planet['picture'], "%s %i" % (star['name'], planet['position']))
-
         self.draw(star, planet, colony)
 
         while True:
             event = self.get_event()
             if event:
                 action = event['action']
-
-                if action == "ESCAPE":
-                    break
-
+                if action == "ESCAPE"):
+                    return
+           
                 elif action == "morale_summary":
-                    colony.print_morale_summary()
+                    summary = colony.print_morale_summary();
+                    GUI.draw_textbox(summary, 135, 190,'Morale Summary')
+                    triggers2 = draw(GAME, star, planet, colony)
 
+            
                 elif action == "bc_summary":
-                    colony.print_bc_summary()
+                    summary = colony.print_bc_summary();
+                    GUI.draw_textbox( summary, 135, 190, 'BC Summary')
+                    triggers2 = draw(GAME, star, planet, colony)
 
                 elif action == "food_summary":
-                    colony.print_food_summary()
+                    summary = colony.print_food_summary();
+                    GUI.draw_textbox(summary, 135, 190, 'Food Summary')
+                    triggers2 = draw(GAME, star, planet, colony)
 
                 elif action == "industry_summary":
-                    colony.print_industry_summary()
+                    summary = colony.print_industry_summary();
+                    GUI.draw_textbox(summary, 135, 190, 'Industry Summary')
+                    triggers2 = draw(GAME, star, planet, colony)
 
                 elif action == "research_summary":
-                    colony.print_research_summary()
+                    summary = colony.print_research_summary();
+                    GUI.draw_textbox(summary, 135, 190, 'Research Summary')
+                    triggers2 = draw(GAME, star, planet, colony)
 
                 elif action == "change_build":
-                    self.get_screen('COLONY_BUILD').run(GAME, event['colony_id'])
-                    self.draw(star, planet, colony)
+                    colony_build_screen.run(GAME, colony_id)
+                    triggers2 = draw(GAME, star, planet, colony)
+
+                else:
+                    print "UNKNOWN ACTION: " + action
+

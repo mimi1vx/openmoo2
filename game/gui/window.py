@@ -75,3 +75,74 @@ class Window():
 
     def get_event(self):
         return self.__input.get_event(self.get_triggers_list())
+
+    
+    def draw_textbox(self, lines, x, y, title="", color = (0,255,0)):
+
+        """draws a MOO2 textbox of varying size,at position x,y,  big enough to output all strings in lines[] """
+        buttons = []
+        schemes_font_palette = [0x0, 0x141420, 0x6c688c]
+        light_text_palette = [0x0, 0x802810, 0xe48820, 0xe46824]
+        dark_text_palette = [0x0, 0x440c00, 0xac542c]
+
+
+        self.add_trigger({'action': "ESCAPE",    	'rect': pygame.Rect((1, 1), ( 640, 480))})
+
+
+        DISPLAY         = self.get_display()
+
+        font2 = self.get_font('font2')
+        font3 = self.get_font('font3')
+        font5 = self.get_font('font5')
+
+        screen_width, screen_height = 640, 480;
+
+        mid_part_width=self.get_image('text_box','top').get_width();
+        mid_part_height=10 + 15*len(lines);
+
+        off_y1 = self.get_image('text_box','top').get_height();
+        off_y2 = mid_part_height + off_y1;
+
+        y3 = self.get_image('text_box','bottom').get_height();
+
+        
+        
+        # kludge? Correction for outsized boxes, where the bottom would have ended up outside of screen area
+        bottom_box_boundary = y + mid_part_height + off_y1 +y3;
+        if( bottom_box_boundary) > screen_height :
+            y = y - (bottom_box_boundary - screen_height)
+
+        y1 = y + off_y1;
+        y2 = y + off_y2;
+
+
+        DISPLAY.blit(self.get_image('text_box','top'), (x, y))
+        temp_r = pygame.Rect((1,1),(1+mid_part_width,1+mid_part_height))
+
+        DISPLAY.blit(self.get_image('text_box','middle'), (x, y1),temp_r);
+
+        DISPLAY.blit(self.get_image('text_box','bottom'), (x, y2))
+
+        font5.write_text(DISPLAY, x + 120, y + 20, title, light_text_palette, 1)
+
+        lheight=40;
+
+        for i in range(len(lines)):
+        #   TODO: some intelligent way of justifying the lines, so the output resembles the original game
+            font3.write_text(DISPLAY, x + 40, y + lheight, lines[i], dark_text_palette, 1)
+            lheight=lheight+15
+
+        self.flip()
+
+        while True:
+            event = self.get_event()
+            if event:
+                action = event['action']
+
+                print "Textbox method, event: "+action;
+                if action == "ESCAPE":
+                    return
+
+            #return buttons
+
+

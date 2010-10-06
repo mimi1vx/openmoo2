@@ -202,6 +202,7 @@ class Colony(GameObject):
     """
     """
     def display_summary(self, title, foot, summary):
+        r_summary=[]
         total = rules.count_summary_result(summary)
         print("+----------------------------------------------------+")
         print("+ %s +" % title.ljust(50))
@@ -209,31 +210,40 @@ class Colony(GameObject):
         for k in summary:
             if summary[k]:
                 print("+ %s ... %s +" % (str(summary[k]).rjust(6), k.ljust(39)))
+                r_summary.append("%s   %s" % (str(summary[k]).rjust(6), k.ljust(39)))
         print("+                                                    +")
         print("+ % 6i ... %s +" % (total, foot.ljust(39)))
         print("+----------------------------------------------------+")
+        r_summary.append(' ')
+        r_summary.append("% 6i ... %s" % (total, foot.ljust(39)))
+
+        return r_summary
 
     """
         Returns Morale Summary
     """
     def print_morale_summary(self):
-        self.display_summary("Morale Summary", "Total", self.get_morale_summary())
+        return self.display_summary("Morale Summary", "Total", self.get_morale_summary())
+
     # end func print_morale_summary
 
     def print_bc_summary(self):
-        self.display_summary("BC Summary", "Total Income", self.get_bc_summary())
+        return self.display_summary("BC Summary", "Total Income", self.get_bc_summary())
+
     # end func print_bc_summary
 
     def print_food_summary(self):
-        self.display_summary("Food Summary", "Total Food Produced", self.get_food_summary())
+        return self.display_summary("Food Summary", "Total Food Produced", self.get_food_summary())
+
     # end func print_food_summary
 
     def print_industry_summary(self):
-        self.display_summary("Industry Summary", "Total Industry Produced", self.get_industry_summary())
+        return self.display_summary("Industry Summary", "Total Industry Produced", self.get_industry_summary())
     # end func print_industry_summary
 
     def print_research_summary(self):
-        self.display_summary("Research Summary", "Research Industry Produced", self.get_research_summary())
+        return self.display_summary("Research Summary", "Research Industry Produced", self.get_research_summary())
+
     # end func print_research_summary
 
     """
