@@ -62,6 +62,7 @@ TECH_TABLE = {
     14:	{
         'name':		"Armor Barracks",
         'area':		20,
+        'description':  "Creates tank battalions. It has 2 units when built, and ads 1 unit every 10 turns, up to half the planet's  population. Eliminates the morale penalty for dictatorship and feudal governments."
     },
     15:	{
         'name':		"Artemis System Net",
@@ -162,14 +163,17 @@ TECH_TABLE = {
     39:	{
         'name':		"Cloning Center",
         'area':		1,
+        'description':  "Allows doctors to replace failing or damaged organs, increasing the population grow by +100K each turn as long as the current population is below the planetary maximum."
     },
     40:	{
         'name':		"Colony Base",
         'area':		0,
+        'description':  "Creates a colony on another planet inside the same star system as the building colony."
     },
     41:	{
         'name':		"Colony Ship",
         'area':		23,
+        'description':  "Capable of creating a colony in a distant star system. Will not engage in combat and will be destroyed when attacked if not escorted by a military ship."
     },
     42:	{
         'name':		"Confederation",
@@ -443,6 +447,7 @@ TECH_TABLE = {
     109:	{
         'name':		"Outpost Ship",
         'area':		23,
+        'description':  "Capable of creating an outpost on any uninhabited planet. Outposts function like a colony, except no population units may be moved there. Outpost ships are unarmed and will be destroyed if not escorted by military ships."
     },
     110:	{
         'name':		"Moleculartronic Computer",
