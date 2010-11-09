@@ -36,7 +36,7 @@ def main(argv):
 
     print("* Init...")
     GAME = game.Game(rules.DEFAULT_RULES)
-    print("* Load...")
+    print("* Loading savegame from '%s'" % GAME_FILE)
     GAME.load_moo2_savegame(GAME_FILE)
 
 #    GAME.show_stars()
