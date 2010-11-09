@@ -3,8 +3,6 @@ import sys
 
 sys.path.append("classes")
 
-import colony
-
 MAX_TECHNOLOGIES = 0xCB             # 203 technologies
 
 def get_int(b0, b1, b2 = 0, b3 = 0):
@@ -28,6 +26,26 @@ def read_signed_byte(data, offset):
 def read_string(data, offset, length):
     return data[offset:offset + length].rstrip(chr(0) + chr(1) + chr(2) + chr(3)).split(chr(0))[0]
 
+
+def bitmask_to_player_id_list(bitmask):
+    list = []
+    if bitmask & 1:
+        list.append(0)
+    if bitmask & 2:
+        list.append(1)
+    if bitmask & 4:
+        list.append(2)
+    if bitmask & 8:
+        list.append(3)
+    if bitmask & 16:
+        list.append(4)
+    if bitmask & 32:
+        list.append(5)
+    if bitmask & 64:
+        list.append(6)
+    if bitmask & 128:
+        list.append(7)
+    return list
 
 """
 """
