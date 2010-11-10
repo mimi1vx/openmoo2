@@ -16,12 +16,12 @@ class MainScreen(Screen):
     def reset_triggers_list(self):
         Screen.reset_triggers_list(self)
         self.add_trigger({'action': "game_menu",        'rect': pygame.Rect((255,   8), (50, 12))})
-        self.add_trigger({'action': "colonies_screen",	'rect': pygame.Rect(( 20, 431), (65, 38))})
-        self.add_trigger({'action': "leaders_screen",	'rect': pygame.Rect((315, 431), (65, 38))})
-        self.add_trigger({'action': "info_screen",	'rect': pygame.Rect((460, 431), (65, 38))})
+        self.add_trigger({'action': "colonies_screen",	'rect': pygame.Rect(( 20, 431), (65, 38)), 'key': 99}) # C key
+        self.add_trigger({'action': "leaders_screen",	'rect': pygame.Rect((315, 431), (65, 38)), 'key': 108}) # L key
+        self.add_trigger({'action': "info_screen",	'rect': pygame.Rect((460, 431), (65, 38)), 'key': 105}) # I key
         self.add_trigger({'action': "research_screen",	'rect': pygame.Rect((547, 347), (64, 66))})
         self.add_trigger({'action': "newTurn",		'rect': pygame.Rect((547, 444), (59, 19))})
-        self.add_trigger({'action': "planets_screen",    'rect': pygame.Rect((93, 431), (65, 38))})
+        self.add_trigger({'action': "planets_screen",    'rect': pygame.Rect((93, 431), (65, 38)), 'key': 112}) # P key
 
     def get_pos(self, (x, y)):
         pos_x = self.__map_x + ((x * self.__map_width) / self.__galaxy_width)

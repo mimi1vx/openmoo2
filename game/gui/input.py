@@ -89,6 +89,9 @@ class Input():
                 if event.key == K_ESCAPE:
                     return {'action': "ESCAPE"}
                 else:
+                    for trigger in triggers_list:
+                        if trigger.has_key("key") and trigger['key'] == event.key:
+                            return trigger
                     return {'action': "key", 'key': event.key}
 
             elif event.type == MOUSEBUTTONUP:
