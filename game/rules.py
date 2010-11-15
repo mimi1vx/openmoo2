@@ -470,7 +470,7 @@ def compose_bc_summary(RULES, colony, PLAYERS):
 #	print build_queue[4]
 #	print build_queue[5]
 #	print build_queue[6]
-    if build_queue[0]['production_id'] == BUILD_TRADE_GOODS:
+    if (len(build_queue) > 0) and (build_queue[0]['production_id'] == BUILD_TRADE_GOODS):
         summary['trade_goods'] = int(colony.get_industry() / 2)
 
 

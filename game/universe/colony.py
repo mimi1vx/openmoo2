@@ -10,17 +10,11 @@ import rules
 
 from game_object import GameObject
 
-import dictionary
-
 class Colony(GameObject):
 
     def __init__(self, colony_id):
         self.__planet = None
         self.set_id(colony_id)
-
-#    def __print_summary_item(self, data, key, title):
-#        if data.has_key(key) and data[key]:
-#            print "+     %s ... %s    +" % (str(data[key]).ljust(6), title.ljust(25))
 
     def set_planet_id(self, planet_id):
         self.__planet_id = planet_id
@@ -95,13 +89,13 @@ class Colony(GameObject):
                                     lbx.read_short_int(data, 0x0D8),	# androids
                                     lbx.read_short_int(data, 0x0DA)	# natives
                                 ]
-        self.n_turns_existed		= lbx.read_char(data,  0x0DC)	# bookeeping
-        self.food2_per_farmer		= lbx.read_char(data,  0x0DD)	# Food per farmer in half-units of food
-        self.industry_per_worker	= lbx.read_char(data,  0x0DE)
-        self.research_per_scientist	= lbx.read_char(data,  0x0DF)
-        self.max_farms			= lbx.read_char(data,  0x0E0)
-        self.__max_population		= lbx.read_char(data,  0x0E1)
-        self.climate			= lbx.read_char(data,  0x0E2)
+        self.n_turns_existed		= ord(data[0x0DC])	# bookeeping
+        self.food2_per_farmer		= ord(data[0x0DD])	# Food per farmer in half-units of food
+        self.industry_per_worker	= ord(data[0x0DE])
+        self.research_per_scientist	= ord(data[0x0DF])
+        self.max_farms			= ord(data[0x0E0])
+        self.__max_population		= ord(data[0x0E1])
+        self.climate			= ord(data[0x0E2])
         self.ground_strength		= lbx.read_short_int(data, 0x0E3)	# calculated for ai
         self.space_strength		= lbx.read_short_int(data, 0x0E5)	# calculated for ai
         self.set_food(lbx.read_short_int(data, 0x0E7))	# total food = food - population
@@ -109,36 +103,12 @@ class Colony(GameObject):
         self.set_research(lbx.read_short_int(data, 0x0EB))
 #		0x0ed		?
 
-        self.__build_queue = [
-            {
-                'production_id':    lbx.read_char(data,  0x115),
-                'flags':            lbx.read_char(data,  0x116)
-            },
-            {
-                'production_id':    lbx.read_char(data,  0x117),
-                'flags':            lbx.read_char(data,  0x118)
-            },
-            {
-                'production_id':    lbx.read_char(data,  0x119),
-                'flags':            lbx.read_char(data,  0x11a)
-            },
-            {
-                'production_id':    lbx.read_char(data,  0x11b),
-                'flags':            lbx.read_char(data,  0x11c)
-            },
-            {
-                'production_id':    lbx.read_char(data,  0x11d),
-                'flags':            lbx.read_char(data,  0x11e)
-            },
-            {
-                'production_id':    lbx.read_char(data,  0x11f),
-                'flags':            lbx.read_char(data,  0x120)
-            },
-            {
-                'production_id':    lbx.read_char(data,  0x121),
-                'flags':            lbx.read_char(data,  0x122)
-            }
-        ]
+        self.__build_queue = []
+        for i in range(0, 14, 2):
+            production_id = ord(data[0x115 + i])
+            if production_id < 0xFF:
+                self.__build_queue.append({'production_id': production_id, 'flags': ord(data[0x115 + i + 1])})
+        
 #		0x115		building item #0				# 0x0b = colony base??? 0xf9 = spy? 0xfd = housing 0xfe = trade goods
 #			0x0b = colony base
 #			0xf9 = spy
