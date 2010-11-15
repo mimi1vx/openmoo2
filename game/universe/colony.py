@@ -199,6 +199,43 @@ class Colony(GameObject):
     def get_bc_summary(self):
         return self.__bc_summary
 
+    def init_available_production(self, game_rules, players):
+        """returns a dict of production id lists"""
+
+        rules_buildings = game_rules['buildings']
+        ME = players[self.get_owner()]
+        known_techs = ME.get_known_techs()
+
+        replaced = []
+        for production_id in self.list_buildings():
+            if rules_buildings[production_id].has_key("replaces"):
+                print rules_buildings[production_id]['replaces']
+                for replaces_id in rules_buildings[production_id]['replaces']:
+                    replaced.append(replaces_id)
+
+        available = {'building': [], 'xship': [], 'special': [], 'capitol': []}
+        for production_id, production in rules_buildings.items():
+            if production['tech']:
+                # knows required technology and not built
+                if (production['tech'] in known_techs) and (not self.has_building(production_id)) and (not production_id in replaced):
+                    if production.has_key('type'):
+                        group_id = production['type']
+                    else:
+                        group_id = "building"
+                    available[group_id].append("%s:%i" % (production['name'], production_id))
+        for group_id in available:
+            available[group_id].sort()
+            for i in range(len(available[group_id])):
+                available[group_id][i] = int(available[group_id][i].split(":")[1])
+
+# TODO: check for gravity and colonists, if the gravity generator is not needed here remove it from the list
+# TODO: check for colonists if the alien management center is needed, otherwise remove it from the list
+
+        self.__available_production = available
+
+    def get_available_production(self):
+        return self.__available_production
+    
     """
     """
     def display_summary(self, title, foot, summary):
@@ -356,8 +393,26 @@ class Colony(GameObject):
     def pop_grow(self):
         return self.__pop_grow
 
+    def set_build_queue(self, queue):
+        self.__build_queue = queue
+
     def get_build_queue(self):
         return self.__build_queue
+
+    def get_build_queue_ids(self):
+        id_list = []
+        for item in self.__build_queue:
+            id_list.append(item['production_id'])
+        return id_list
+
+    def add_build_item(self, production_id, flags = 0):
+        if len(self.__build_queue) < 7:
+           self.__build_queue.append({'production_id': production_id, 'flags': flags})
+
+    def remove_build_item(self, production_id):
+        build_queue_ids = self.get_build_queue_ids()
+        if production_id in build_queue_ids:
+            self.__build_queue.pop(build_queue_ids.index(production_id))
 
     def get_build_item(self):
         if self.__build_queue[0]['production_id'] == 0xFF:
@@ -577,6 +632,7 @@ class Colony(GameObject):
 
 #	    print
 #	    print("")
+            self.init_available_production(game_rules, players)
     # end func recount
 
 class EnemyColony(Colony):

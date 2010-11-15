@@ -6,39 +6,6 @@ from screen import Screen
 
 from _buildings import *
 
-def list_available_production(rules_buildings, colony, known_techs):
-    """returns a dict of production id lists"""
-    replaced = []
-    for production_id in colony.list_buildings():
-        if rules_buildings[production_id].has_key("replaces"):
-            print rules_buildings[production_id]['replaces']
-            for replaces_id in rules_buildings[production_id]['replaces']:
-                replaced.append(replaces_id)
-
-    available = {'building': [], 'xship': [], 'special': [], 'capitol': []}
-    for production_id, production in rules_buildings.items():
-#        production = rules_buildings[production_id]
-        if production['tech']:
-            # knows required technology and not built
-            if (production['tech'] in known_techs) and (not colony.has_building(production_id)) and (not production_id in replaced):
-                if production.has_key('type'):
-                    group_id = production['type']
-                else:
-                    group_id = "building"
-#                if not available.has_key(group_id):
-#                    available[group_id] = []
-                available[group_id].append("%s:%i" % (production['name'], production_id))
-    for group_id in available:
-        available[group_id].sort()
-        for i in range(len(available[group_id])):
-#            print(i)
-#            print(available[group_id][i])
-#            print(available[group_id][i].split(":"))
-            available[group_id][i] = int(available[group_id][i].split(":")[1])
-
-    return available
-
-
 class ColonyBuildScreen(Screen):
 
     def __init__(self, ui):
@@ -100,7 +67,7 @@ class ColonyBuildScreen(Screen):
     #    buildings = colony.list_buildings()
         print("")
         print("=== Available Production: ===")
-        available_production = list_available_production(RULES['buildings'], colony, ME.get_known_techs())
+        available_production = colony.get_available_production()
 
         # hack Trade Goods to the first position in list
         if 254 in available_production['building']:
