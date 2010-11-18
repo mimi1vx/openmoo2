@@ -59,6 +59,9 @@ class Planet(GameObject):
     def terrain_text(self):
         return dictionary.planet_terrain(self.get_terrain())
 
+    def gravity_text(self):
+        return dictionary.planet_gravity(self.get_gravity())
+
     def set_picture(self, picture):
         self.__picture = picture
 
@@ -136,3 +139,5 @@ class Planet(GameObject):
 
     def is_planet(self):
         return self.get_type() == 3
+    
+

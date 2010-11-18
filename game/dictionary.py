@@ -16,6 +16,9 @@ def planet_minerals(minerals):
 def greek_num(num):
     return ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][num]
 
+def planet_gravity(gravity):
+    return ['Low G', 'Normal G', 'Heavy G'][gravity];
+
 def get_dictionary():
     return {
     'COLONY_TYPES':             ["Colony", "Outpost"],
