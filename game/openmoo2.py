@@ -3,7 +3,6 @@ import os
 
 import sys
 import cli
-import graphic
 
 import pygame
 
@@ -68,19 +67,7 @@ def main(argv):
 
     SOCKET_BUFFER_SIZE = 4096
 
-    GUI = graphic.Gui(pygame)
-    GUI.load_lbx_archives(MOO2_DIR)
-    if not GUI.check_lbx_archives():
-        print("")
-        print("ERROR: some LBX files didn't match the expected MD5 checsum")
-        print("")
-        print("    The OpenMOO2 supports only original LBX files from MOO2 version 1.31")
-
-    GUI.init()
-    GUI.load_fonts()
-    GUI.load_raw_palettes()
-    GUI.init_palettes()
-    GUI.load_graphic()
+    GUI = gui.Gui(pygame, MOO2_DIR)
 
     pygame.mouse.set_visible(False)
     gui.Input().set_display(pygame.display.get_surface())
