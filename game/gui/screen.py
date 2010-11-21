@@ -1,10 +1,12 @@
 import pygame
 import window
 
+import gui
+
 class Screen(window.Window):
 
-    def __init__(self, ui):
-        window.Window.__init__(self, ui)
+    def __init__(self):
+        window.Window.__init__(self)
 
     def flip(self):
         for trigger in self.get_triggers_list():
@@ -12,16 +14,13 @@ class Screen(window.Window):
 #                pygame.draw.rect(self.get_display(), 0xdab1e1, trigger['rect'], 1)
                 pass
         self.force_draw_mouse_cursor()
-        self.get_ui().flip()
+        gui.GUI.flip()
 
     def attach_screens(self, screens):
         self.__screens = screens
 
-    def get_screen(self, screen_id):
-        return self.__screens[screen_id]
-
     def get_image(self, img_key, subkey1 = None, subkey2 = None, subkey3 = None):
-        return self.get_ui().get_image(img_key, subkey1, subkey2, subkey3)
+        return gui.GUI.get_image(img_key, subkey1, subkey2, subkey3)
 
     def repeat_draw(self, target_surface, x, y, source_surface, number, icon_width, break_count, area_width):
         if number < break_count:

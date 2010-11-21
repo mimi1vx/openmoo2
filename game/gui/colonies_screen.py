@@ -1,10 +1,16 @@
 import pygame
-from screen import Screen
+import screen
 
-class ColoniesScreen(Screen):
+import networking
+import gui
 
-    def __init__(self, ui):
-        Screen.__init__(self, ui)
+import colony_screen
+import colony_build_screen
+
+class ColoniesScreen(screen.Screen):
+
+    def __init__(self):
+        screen.Screen.__init__(self)
 
         self.__view_size = 10
 
@@ -12,26 +18,24 @@ class ColoniesScreen(Screen):
         self.__list_size  = 0
 
     def reset_triggers_list(self):
-        Screen.reset_triggers_list(self)
+        screen.Screen.reset_triggers_list(self)
         self.add_trigger({'action': "ESCAPE",        'rect': pygame.Rect((534, 448), (77, 19))})
         self.add_trigger({'action': "SCROLL_UP",      'rect': pygame.Rect((620, 16), (8, 18))})
         self.add_trigger({'action': "SCROLL_DOWN",    'rect': pygame.Rect((620, 318), (8, 18))})
 
     def draw(self):
-        GAME = self.__GAME
-        PLAYERS     = GAME['DATA']['players']
-        COLONIES    = GAME['DATA']['colonies']
-        ME          = GAME['DATA']['me']
+        PLAYERS = networking.Client.list_players()
+        COLONIES = networking.Client.list_colonies()
+        ME = networking.Client.get_me()
 
-        DATA        = GAME['DATA']
-        RULES       = DATA['rules']
+        RULES = networking.Client.rules()
 
-        DISPLAY = self.get_display()
+        DISPLAY = gui.GUI.get_display()
 
         DISPLAY.blit(self.get_image('colonies_screen', 'panel'), (0, 0))
 
-        font2 = self.get_font2()
-        font3 = self.get_font3()
+        font2 = gui.GUI.get_font('font2')
+        font3 = gui.GUI.get_font('font3')
 
         my_colonies = []
 
@@ -99,8 +103,7 @@ class ColoniesScreen(Screen):
 
         self.flip()
 
-    def run(self, GAME):
-        self.__GAME = GAME
+    def run(self):
         self.draw()
 
         while True:
@@ -125,9 +128,12 @@ class ColoniesScreen(Screen):
                         self.draw()
 
                 elif action == "colony":
-                    self.get_screen('COLONY').run(GAME, event['colony_id'])
+                    colony_screen.Screen.run(event['colony_id'])
                     self.draw()
 
                 elif action == "colony_build":
-                    self.get_screen('COLONY_BUILD').run(GAME, event['colony_id'])
+                    colony_build_screen.Screen.run(event['colony_id'])
                     self.draw()
+
+
+Screen = ColoniesScreen()

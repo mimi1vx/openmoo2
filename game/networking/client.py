@@ -12,19 +12,19 @@ import time
 __author__="peterman"
 __date__ ="$Jan 1, 2010 2:42:50 PM$"
 
-class Client():
+class GameClient(object):
 
-    def __init__(self, host, port, buffer_size):
+    def __init__(self):
         self.__socket = game_socket.GameSocket(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
-        self.__socket.set_buffer_size(buffer_size)
         self.__socket.settimeout(1)
 #        self.clientSocket = socket(AF_INET, SOCK_STREAM)
 #        self.clientSocket.settimeout(SOCKET_TIMEOUT)
+
+    def connect(self, host, port, buffer_size = 4096):
+        self.__socket.set_buffer_size(buffer_size)
         self.__host = host
         self.__port = port
-
-    def connect(self):
-        self.__socket.connect((self.__host, self.__port))
+        self.__socket.connect((host, port))
 
     def disconnect(self):
         self.__socket.close()
@@ -50,12 +50,67 @@ class Client():
         return self.recv()
 
     def fetch_game_data(self):
-        self.send("FETCH_GAME_DATA")
         time.sleep(1)
-        data = self.recv()
-        if not data:
+        self.send("FETCH_GAME_DATA")
+        self.__game_data = self.recv()
+        if not self.__game_data:
             print("! ERROR: GameClient::fetch_game_data() ... no data???")
-        return data
+            return False
+        return True
+
+    def game_data(self):
+        return self.__game_data
+
+    def rules(self):
+        return self.__game_data['rules']
+
+    def get_galaxy(self):
+        return self.__game_data['galaxy']
+
+    def get_stardate(self):
+        return self.__game_data['galaxy']['stardate']
+
+    def list_stars(self):
+        return self.__game_data['stars']
+
+    def get_star(self, star_id):
+        return self.__game_data['stars'][star_id]
+
+    def list_stars_by_coords(self):
+        return self.__game_data['stars_by_coords']
+
+    def list_planets(self):
+        return self.__game_data['planets']
+
+    def get_planet(self, planet_id):
+        return self.__game_data['planets'][planet_id]
+
+    def list_colonies(self):
+        return self.__game_data['colonies']
+
+    def get_colony(self, colony_id):
+        return self.__game_data['colonies'][colony_id]
+
+    def list_ships(self):
+        return self.__game_data['ships']
+
+    def list_prototypes(self):
+        return self.__game_data['prototypes']
+
+    def list_officers(self):
+        return self.__game_data['officers']
+
+    def list_colony_leaders(self):
+        return self.__game_data['colony_leaders']
+
+    def list_players(self):
+        return self.__game_data['players']
+
+    def get_player(self, player_id):
+        return self.__game_data['players'][player_id]
+
+    def get_me(self):
+        return self.__game_data['me']
 
     def wait_for_next_turn(self):
 #	print("GameClient::wait_for_next_turn()")
@@ -116,3 +171,5 @@ class Client():
         self.send("LIST_COLONIES")
         return self.recv()
 """
+
+Client = GameClient()

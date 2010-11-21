@@ -2,34 +2,32 @@ import pygame
 
 from _game_constants import *
 
-from screen import Screen
+import screen
 
 from _buildings import *
 
-class ColonyBuildScreen(Screen):
+import networking
+import gui
 
-    def __init__(self, ui):
-        Screen.__init__(self, ui)
+class ColonyBuildScreen(screen.Screen):
+
+    def __init__(self):
+        screen.Screen.__init__(self)
 
     def reset_triggers_list(self):
-        Screen.reset_triggers_list(self)
+        screen.Screen.reset_triggers_list(self)
         self.add_trigger({'action': "ESCAPE", 'hover_id': "ESCAPE", 'rect': pygame.Rect((496, 448), (56, 16))})
 
     def draw(self, star, planet, colony):
-        GAME = self.__GAME
-        DISPLAY     = self.get_display()
-#        IMAGES      = GAME['IMAGES']
-#        PALETTES	= GAME['PALETTES']
-#        FONTS       = GAME['FONTS']
+        DISPLAY = gui.GUI.get_display()
 
-        DATA        = GAME['DATA']
-        RULES       = DATA['rules']
-        PROTOTYPES  = DATA['prototypes']
-        ME          = DATA['me']
+        RULES = networking.Client.rules()
+        PROTOTYPES = networking.Client.list_prototypes()
+        ME = networking.Client.get_me()
 
-        font3 = self.get_font3()
-        font4 = self.get_font4()
-        font5 = self.get_font5()
+        font3 = gui.GUI.get_font('font3')
+        font4 = gui.GUI.get_font('font4')
+        font5 = gui.GUI.get_font('font5')
 
         production_palette = [0x0, 0x440c00, 0xac542c]
         xship_palette = [0x0, 0x802810, 0xe48820, 0xe46824]
@@ -41,7 +39,7 @@ class ColonyBuildScreen(Screen):
 
         DISPLAY.blit(self.get_image('background', 'starfield'), (0, 0))
 #        colony_screen.draw_planet_background(GUI, DISPLAY, IMAGES, PALETTES, planet.get_terrain(), planet.get_picture())
-        DISPLAY.blit(self.get_ui().get_planet_background(planet.get_terrain(), planet.get_picture()), (0, 0))
+        DISPLAY.blit(gui.GUI.get_planet_background(planet.get_terrain(), planet.get_picture()), (0, 0))
 
         shadow = pygame.Surface((640, 480))
 
@@ -205,18 +203,14 @@ class ColonyBuildScreen(Screen):
     #
     #       RUN
     #
-    def run(self, GAME, colony_id):
-        self.__GAME = GAME
+    def run(self, colony_id):
+        colony = networking.Client.get_colony(colony_id)
 
-        DATA	= GAME['DATA']
-
-        colony      = DATA['colonies'][colony_id]
-
-        planet_id	= colony.get_planet_id()
-        planet      = DATA['planets'][planet_id]
+        planet_id = colony.get_planet_id()
+        planet = networking.Client.get_planet(planet_id)
 
         star_id	= planet.get_star()
-        star	= DATA['stars'][star_id]
+        star = networking.Client.get_star(star_id)
 
         self.draw(star, planet, colony)
 
@@ -230,3 +224,7 @@ class ColonyBuildScreen(Screen):
 
                 if action == "hover":
                     print("hover = %s" % event['hover'])
+
+
+
+Screen = ColonyBuildScreen()

@@ -7,7 +7,7 @@ MOUSE_RIGHT_BUTTON      = 3
 MOUSE_WHEELUP		= 4
 MOUSE_WHEELDOWN		= 5
 
-class Input():
+class Input(object):
     """Input is implemented as a singleton!"""
 
     class __Singleton:

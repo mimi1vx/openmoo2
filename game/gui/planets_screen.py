@@ -1,23 +1,19 @@
 import pygame
 
-from screen import Screen
+import screen
+import networking
+import gui
 
-class PlanetsScreen(Screen):
+class PlanetsScreen(screen.Screen):
 
     def get_planets_to_display(self, player_id):
         planets = []
-        stars_i = self.__DATA['stars']
-        stars = []
-        for i_s in stars_i:
-            stars.append(self.__DATA['stars'][i_s])
             
-        for star in stars:
+        for star_id, star in networking.Client.list_stars().items():
             if star.visited_by_player(player_id):
-                objects = star.get_objects()
-                for id in objects:
-                    planet_id = id
-                    if planet_id != 0xffff:
-                        planet = self.__DATA['planets'][planet_id]
+                for object_id in star.get_objects():
+                    if object_id != 0xffff:
+                        planet = networking.Client.get_planet(object_id)
                         if planet.is_planet():
                             planets.append(planet)
         return planets
@@ -25,25 +21,23 @@ class PlanetsScreen(Screen):
     def scroll_up(self, step = 1):
         self.viewport_top_planet -=step
         if self.viewport_top_planet < 0:
-                self.viewport_top_planet =0
+                self.viewport_top_planet = 0
         self.draw()
-        return
 
     def scroll_down(self, step = 1):
-        self.viewport_top_planet +=step
+        self.viewport_top_planet += step
         if self.viewport_top_planet not in range(self.planets_to_display - self.viewport_size):
             self.viewport_top_planet = self.planets_to_display - self.viewport_size
         self.draw()
-        return
 
-    def __init__(self, ui):
-        Screen.__init__(self, ui)
+    def __init__(self):
+        screen.Screen.__init__(self)
         self.viewport_size = 8
         self.viewport_top_planet = 0
         self.planets_to_display = 0
 
     def reset_triggers_list(self):
-        Screen.reset_triggers_list(self)
+        screen.Screen.reset_triggers_list(self)
 
         #sort priority triggers
         self.add_trigger({'action': "PRIORITY_CLIMATE", 'rect': pygame.Rect((440, 200), ( 60, 25))})
@@ -81,17 +75,15 @@ class PlanetsScreen(Screen):
 
     def draw(self):
 
-        DISPLAY     = self.get_display()
-        title_shadow_palette = [0x0, 0x181c40, 0x20284c, 0x20284c]
-        title_palette = [0x0, 0x181c40, 0x506c90, 0x445c80]
+        ME = networking.Client.get_me()
+
+        DISPLAY = gui.GUI.get_display()
         viewport_font_palette = [0x0, 0x181c40, 0x688cb0]
-        font2 = self.get_font('font2')
-        font3 = self.get_font('font3')
-        font5 = self.get_font('font5')
+        font3 = gui.GUI.get_font('font3')
 
         DISPLAY.blit(self.get_image('planets_screen', 'panel'), (0, 0))
    
-        planets = self.get_planets_to_display(self.ME.get_id())
+        planets = self.get_planets_to_display(ME.get_id())
         #TODO: sorting planets 
         self.planets_to_display = len(planets)
         ftd = self.viewport_top_planet
@@ -107,7 +99,7 @@ class PlanetsScreen(Screen):
 
             star_id= ptd.get_star()
 
-            name_t = self.__DATA['stars'][star_id].get_name()
+            name_t = networking.Client.get_star(star_id).get_name()
             terrain_t = ptd.terrain_text()
             minerals_t = ptd.minerals_text()
             size_t = ptd.size_text()
@@ -134,11 +126,7 @@ class PlanetsScreen(Screen):
 
         self.flip()
 
-    def run(self, GAME):
-        self.__GAME = GAME
-        self.__DATA = GAME['DATA']
-        self.ME = GAME['DATA']['me']
-        
+    def run(self):
         self.draw()
 
         while True:
@@ -152,8 +140,9 @@ class PlanetsScreen(Screen):
                 if action == "VIEWPORT_DOWN":
                     self.scroll_down()
                 if action == "SCROLL_UP":
-                    self.scroll_up(4)
+                    self.scroll_up()
                 if action == "SCROLL_DOWN":
-                    self.scroll_down(4)
+                    self.scroll_down()
                    
-                    
+
+Screen = PlanetsScreen()

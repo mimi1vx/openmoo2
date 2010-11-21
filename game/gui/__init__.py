@@ -1,5 +1,7 @@
-import lbx
+import pygame
 import copy
+
+import lbx
 
 from splash_screen import SplashScreen
 
@@ -18,24 +20,25 @@ from fonts_screen import FontsScreen
 
 from input import Input
 
-class Gui():
+class Gui(object):
 
-    def __init__(self, pg, moo2_dir):
-        self.__pygame = pg
+    def __init__(self): pass
+
+    def init(self, moo2_dir):
         self.__images = {}
         self.__moo2_dir = moo2_dir
-        self.__pygame.init()
-        self.__pygame.display.set_mode((640, 480), 0, 24)
+        pygame.init()
+        pygame.display.set_mode((640, 480), 0, 24)
         self.__load_lbx_archives()
         self.__load_fonts()
         self.__load_palettes()
         self.__load_graphic()
 
     def get_display(self):
-        return self.__pygame.display.get_surface()
+        return pygame.display.get_surface()
 
     def flip(self):
-        self.__pygame.display.flip()
+        pygame.display.flip()
 
     def __read_text_file(self, filename):
         """returns the content of the given text file as a list of strings"""
@@ -200,3 +203,6 @@ class Gui():
 			self.load_solid_image(source_file, source_index, lbx_palette, img_key, subkey1, subkey2, subkey3)
 
 	print "...Done"
+
+
+GUI = Gui()

@@ -5,7 +5,7 @@ import hashlib
 import pickle
 import game_socket
 
-class Server():
+class GameServer(object):
 
     def __init__(self, host, port, game):
         self.set_name("unnamed")

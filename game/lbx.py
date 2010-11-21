@@ -189,7 +189,7 @@ def load_surface(picture, picture_frame, local_palette, colorkey = None):
 # end func load_surface
 
 
-class Archive():
+class Archive(object):
 
 #    __filename = None
 #    __filesize = 0
@@ -410,7 +410,7 @@ offset ~ offset         size        meaning
                                     0x8n: skip n pixels
 """
 
-class Font():
+class Font(object):
 
     def __init__(self, font_file_data, font_id):
         self.__glyphs = {}

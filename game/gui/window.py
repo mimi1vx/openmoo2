@@ -3,10 +3,11 @@ import pygame
 
 import input
 
-class Window():
+import gui
 
-    def __init__(self, ui):
-        self.set_ui(ui)
+class Window(object):
+
+    def __init__(self):
         self.reset_triggers_list()
         self.__input = input.Input()
 
@@ -17,26 +18,6 @@ class Window():
     def log_error(self, message):
         ts = int(time.time())
         print("! ERROR %i ... %s" % (ts, message))
-
-    def set_display(self, display):
-#        print("@ @ @ gui_window::Window::set_display()")
-        self.__display = display
-
-    def get_display(self):
-        return self.get_ui().get_display()
-
-    def set_ui(self, ui):
-#        print("@ @ @ gui_window::Window::__set_ui()")
-        self.__ui = ui
-
-    def get_ui(self):
-        return self.__ui
-
-    def get_all_fonts(self):
-        return self.__ui.get_all_fonts()
-
-    def get_font(self, font_id):
-        return self.__ui.get_font(font_id)
 
     def reset_triggers_list(self):
         self.__triggers = []

@@ -45,7 +45,7 @@ def main(argv):
 #    GAME.show_colonies()
 #    GAME.show_ships()
 
-    SERVER = networking.Server(LISTEN_ADDR, LISTEN_PORT, GAME)
+    SERVER = networking.GameServer(LISTEN_ADDR, LISTEN_PORT, GAME)
     SERVER.set_name(GAME_FILE.split("/")[-1])
 
     print("* Run...")

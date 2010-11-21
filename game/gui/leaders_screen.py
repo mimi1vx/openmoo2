@@ -1,18 +1,17 @@
-from screen import Screen
+import screen
 import pygame
 
-class LeadersScreen(Screen):
+import networking
+import gui
 
-    def __init__(self, ui):
-        Screen.__init__(self, ui)
+class LeadersScreen(screen.Screen):
+
+    def __init__(self):
+        screen.Screen.__init__(self)
         self.__type = 1
 
-#        self.__leader_faces = {}
-#        for i in range(67):
-#            self.__leader_faces[i] = self.load_image('OFFICER.LBX', 21 + i, 0, 'BUFFER0.LBX', None)
-
     def reset_triggers_list(self):
-        Screen.reset_triggers_list(self)
+        screen.Screen.reset_triggers_list(self)
         self.add_trigger({'action': "ESCAPE",        	'rect': pygame.Rect((544, 445), (70, 18))})
         self.add_trigger({'action': "hire",         	'rect': pygame.Rect((319, 445), (60, 18))})
         self.add_trigger({'action': "showColonyLeaders", 'rect': pygame.Rect((15, 14), (135, 15))})
@@ -20,19 +19,18 @@ class LeadersScreen(Screen):
 
     def draw(self):
 
-        DISPLAY	= self.get_display()
-#        IMAGES	= GAME['IMAGES']
-#        FONTS	= GAME['FONTS']
-        GAME        = self.__GAME
-        DATA        = GAME['DATA']
-        STARS       = DATA['stars']
+        DISPLAY	= gui.GUI.get_display()
+        STARS = networking.Client.list_stars()
 
-        HEROES = DATA[["officers", "colony_leaders"][self.__type]]
+        if self.__type == 1:
+            HEROES = networking.Client.list_colony_leaders()
+        else:
+            HEROES = networking.Client.list_officers()
 
         self.reset_triggers_list()
 
-        font3 = self.get_font('font3')
-        font4 = self.get_font('font4')
+        font3 = gui.GUI.get_font('font3')
+        font4 = gui.GUI.get_font('font4')
 
         DISPLAY.blit(self.get_image('leaders_screen', 'panel'), (0, 0))
 
@@ -180,8 +178,7 @@ class LeadersScreen(Screen):
     ##
     #       RUN
     ##
-    def run(self, GAME):
-        self.__GAME = GAME
+    def run(self):
         self.draw()
 
         while True:
@@ -199,3 +196,6 @@ class LeadersScreen(Screen):
                 elif (action == "showShipOfficers") and (self.__type == 1):
                     self.__type = 0
                     self.draw()
+
+
+Screen = LeadersScreen()

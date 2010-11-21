@@ -1,13 +1,17 @@
-from screen import Screen
+import screen
 
-class SplashScreen(Screen):
+import gui
 
-    def __init__(self, ui):
-        Screen.__init__(self, ui)
+class SplashScreen(screen.Screen):
+
+    def __init__(self):
+        screen.Screen.__init__(self)
 
     def draw(self):
-        self.get_display().blit(self.get_image('splash_screen'), (0, 0))
+        gui.GUI.get_display().blit(self.get_image('splash_screen'), (0, 0))
         self.flip()
 
     def run(self):
         self.draw()
+
+Screen = SplashScreen()

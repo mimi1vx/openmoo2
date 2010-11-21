@@ -2,7 +2,7 @@ import socket
 import pickle
 import time
 
-class GameSocket():
+class GameSocket(object):
 
     def __init__(self, socket):
         self.__socket = socket

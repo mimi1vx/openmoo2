@@ -179,7 +179,7 @@ class Colony(GameObject):
         replaced = []
         for production_id in self.list_buildings():
             if rules_buildings[production_id].has_key("replaces"):
-                print rules_buildings[production_id]['replaces']
+                print "@ colony::init_available_production() ... replaces" + str(rules_buildings[production_id]['replaces'])
                 for replaces_id in rules_buildings[production_id]['replaces']:
                     replaced.append(replaces_id)
 
@@ -510,8 +510,6 @@ class Colony(GameObject):
     """
     def recount(self, game_rules, colony_leader, players):
 #	print "$$$ colony::recount() ... colony_id = %i" % self.colony_id
-#	planet = GAME['DATA']['planets'][self.planet_id]
-#	PLAYERS = GAME['DATA']['players']
 
         self.__bc			= 0
         if not self.exists():

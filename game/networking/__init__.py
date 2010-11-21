@@ -1,2 +1,4 @@
-from server import Server
+from server import GameServer
+from client import GameClient
+
 from client import Client

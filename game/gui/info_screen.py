@@ -1,36 +1,35 @@
 import pygame
-
 from _game_constants import *
 
-from screen import Screen
+import screen
+import networking
+import gui
 
-class InfoScreen(Screen):
+import dictionary
 
-    def __init__(self, ui):
-        Screen.__init__(self, ui)
+class InfoScreen(screen.Screen):
+
+    def __init__(self):
+        screen.Screen.__init__(self)
 	self.__tech_review = "achievements"
 
     def reset_triggers_list(self):
-	Screen.reset_triggers_list(self)
+	screen.Screen.reset_triggers_list(self)
         self.add_trigger({'action': "ESCAPE",    		'rect': pygame.Rect((547, 441), ( 64, 17))})
 
     def draw(self):
-        GAME = self.__GAME
-        DATA        = GAME['DATA']
-        ME          = DATA['me']
-        DISPLAY     = self.get_display()
+        ME = networking.Client.get_me()
+        DISPLAY = gui.GUI.get_display()
 
-        DICTIONARY	= GAME['DICTIONARY']
+        DICTIONARY = dictionary.get_dictionary()
 
-        font3 = self.get_font3()
-        font4 = self.get_font4()
+        font3 = gui.GUI.get_font('font3')
+        font4 = gui.GUI.get_font('font4')
 
         tech_palette = [0x0, 0x082808, 0x0c840c]
 
         DISPLAY.fill((0, 0, 0))
         DISPLAY.blit(self.get_image('info_screen', 'panel'), (0, 0))
-
-#        DISPLAY.blit(FONTS['font_16_bold'].render(stardate(GAME['DATA']['galaxy']['stardate']), 1, (0x0C, 0x94, 0x0C)), (121, 24))
 
         DISPLAY.blit(self.get_image('info_screen', 'button', 'history_graph', 'off'), (21, 50))
         DISPLAY.blit(self.get_image('info_screen', 'button', 'tech_review', 'off'), (21, 77))
@@ -76,9 +75,7 @@ class InfoScreen(Screen):
 
         self.flip()
 
-    def run(self, GAME):
-	self.__GAME = GAME
-
+    def run(self):
         self.draw()
 
         while True:
@@ -88,3 +85,6 @@ class InfoScreen(Screen):
 
                 if action == "ESCAPE":
                     return
+
+
+Screen = InfoScreen()

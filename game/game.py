@@ -164,7 +164,7 @@ class Game:
     # /list_player_colony_leaders
 
     def update_research(self, player_id, research_item):
-        print("Game::set_research() ... player_id = %i, research_item = %i" % (player_id, research_item))
+        print("Game::update_research() ... player_id = %i, research_item = %i" % (player_id, research_item))
         player = self.__players[player_id]
         player.set_research_item(research_item)
         player.set_research_area(self.__rules['tech_table'][research_item]['area'])
@@ -276,6 +276,8 @@ class Game:
         this method returns data for one particular player and leave data for other players
         security reasons to prevent hacked clients to display data that player should not know
         """
+
+         # TODO: implement status checking, to prevent asynchronous requests problems (client receives bad data)
 
 #        player_number = player_id + 1
 

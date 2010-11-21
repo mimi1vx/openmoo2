@@ -8,7 +8,7 @@ def compose_int(b0, b1, b2 = 0, b3 = 0):
     return b0 + (b1 << 8) + (b2 << 16) + (b3 << 24)
 # end func get_int
 
-class Moo2Savegame():
+class Moo2Savegame(object):
     """
     
     """

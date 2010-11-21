@@ -1,4 +1,4 @@
-class AutoPlayer():
+class AutoPlayer(object):
 
     def __init__(self, game_client):
         self.__game_client = game_client

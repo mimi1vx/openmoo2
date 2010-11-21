@@ -1,11 +1,16 @@
 import pygame
-from screen import Screen
+import screen
+
+import networking
+import gui
+
+import colony_screen
 
 from dictionary import greek_num
 
-class StarsystemScreen(Screen):
+class StarsystemScreen(screen.Screen):
 
-    def __init__(self, ui):
+    def __init__(self):
         self.__panel_x, self.__panel_y = 106, 103
 
         self.__panel_x_min = 22
@@ -13,14 +18,14 @@ class StarsystemScreen(Screen):
         self.__panel_y_min = 22
         self.__panel_y_max = 148
 
-        Screen.__init__(self, ui)
+        screen.Screen.__init__(self)
 
     def get_normalized_panel_pos(self, (x, y)):
         return (min(max(x, self.__panel_x_min), self.__panel_x_max), min(max(y, self.__panel_y_min), self.__panel_y_max))
 
     def draw_planet_info(self, text_rows):
-        DISPLAY = self.get_display()
-        font3 = self.get_font3()
+        DISPLAY = gui.GUI.get_display()
+        font3 = gui.GUI.get_font('font3')
         info_palette = [0x0, 0x181c40, 0x688cb0]
         info_x, info_y = self.get_normalized_panel_pos((self.__panel_x, self.__panel_y))
         info_x += 15
@@ -44,18 +49,16 @@ class StarsystemScreen(Screen):
             y += 13
 
     def draw(self, star_id, hover):
-        GAME    = self.__GAME
-        DATA	= GAME['DATA']
-        DISPLAY = self.get_display()
+        DISPLAY = gui.GUI.get_display()
 
         title_shadow_palette = [0x0, 0x181c40, 0x20284c, 0x20284c]
         title_palette = [0x0, 0x181c40, 0x506c90, 0x445c80]
 
-        font5 = self.get_font5()
+        font5 = gui.GUI.get_font('font5')
 
-        ME          = DATA['me']
+        ME = networking.Client.get_me()
 
-        star = DATA['stars'][star_id]
+        star = networking.Client.get_star(star_id)
 
         self.reset_triggers_list()
 
@@ -82,7 +85,7 @@ class StarsystemScreen(Screen):
             for i in range(5):
                 planet_id = star.get_objects()[i]
                 if planet_id != 0xffff:
-                    planet = DATA['planets'][planet_id]
+                    planet = networking.Client.get_planet(planet_id)
                     if planet.is_asteroid_belt():
                         if i == 0:
                             DISPLAY.blit(self.get_image('starsystem_map', 'asteroids', i), (X + 29, Y + 59))
@@ -99,7 +102,7 @@ class StarsystemScreen(Screen):
             for i in range(5):
                 planet_id = star.get_objects()[i]
                 if planet_id != 0xffff:
-                    planet = DATA['planets'][planet_id]
+                    planet = networking.Client.get_planet(planet_id)
 
                     x = X + 200 + (25 * i) + (5 - planet.get_size())
                     y = Y + 121 + (5 - planet.get_size())
@@ -135,9 +138,8 @@ class StarsystemScreen(Screen):
                         colony_id = planet.get_colony_id()
 
                         if colony_id < 0xffff:
-                            colony = DATA['colonies'][colony_id]
-                            player = DATA['players'][colony.get_owner()]
-
+                            colony = networking.Client.get_colony(colony_id)
+                            player = networking.Client.get_player(colony.get_owner())
 
                             if colony.is_owned_by(ME.get_id()) and colony.is_colony():
                                 self.add_trigger({'action': "colony", 'colony_id': colony_id, 'hover_id': hover_id, 'rect': planet_rect})
@@ -162,12 +164,10 @@ class StarsystemScreen(Screen):
 
         self.flip()
 
-    def run(self, GAME, star_id):
-        self.__GAME = GAME
-
+    def run(self, star_id):
         hover = None
 
-        self.__BACKGROUND = self.get_display().copy()
+        self.__BACKGROUND = gui.GUI.get_display().copy()
 
         drag = False
         mouse_rel_x, mouse_rel_y = 0, 0
@@ -204,6 +204,9 @@ class StarsystemScreen(Screen):
                     return
 
                 elif action == "colony":
-                    self.get_screen('COLONY').run(GAME, event['colony_id'])
+                    colony_screen.Screen.run(event['colony_id'])
                     self.get_screen('MAIN').draw()
                     self.draw(star_id, hover)
+
+
+Screen = StarsystemScreen()

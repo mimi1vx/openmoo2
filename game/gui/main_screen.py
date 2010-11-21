@@ -1,20 +1,30 @@
 import pygame
 import pygame_ext
-from screen import Screen
+import screen
 
 from game import stardate
 
-class MainScreen(Screen):
+import networking
+import gui
 
-    def __init__(self, ui):
-        Screen.__init__(self, ui)
+import colonies_screen
+import planets_screen
+import leaders_screen
+import info_screen
+import starsystem_screen
+import research_screen
+
+class MainScreen(screen.Screen):
+
+    def __init__(self):
+        screen.Screen.__init__(self)
         self.__map_x = 22
         self.__map_y = 21
         self.__map_width = 505
         self.__map_height = 400
 
     def reset_triggers_list(self):
-        Screen.reset_triggers_list(self)
+        screen.Screen.reset_triggers_list(self)
         self.add_trigger({'action': "game_menu",        'rect': pygame.Rect((255,   8), (50, 12))})
         self.add_trigger({'action': "colonies_screen",	'rect': pygame.Rect(( 20, 431), (65, 38)), 'key': 99}) # C key
         self.add_trigger({'action': "leaders_screen",	'rect': pygame.Rect((315, 431), (65, 38)), 'key': 108}) # L key
@@ -40,11 +50,9 @@ class MainScreen(Screen):
         self.__map_items[group_key].append({'img': img, 'pos1': (x1, y1), 'pos2': (x2, y2)})
 
     def prepare_stars(self):
-        GAME = self.__GAME
-        DATA     = GAME['DATA']
-        STARS    = DATA['stars']
+        STARS    = networking.Client.list_stars()
 
-        font4 = self.get_font('font4')
+        font4 = gui.GUI.get_font('font4')
 
         map_x, map_y, map_width, map_height = 22, 21, 505, 400
 
@@ -90,16 +98,12 @@ class MainScreen(Screen):
 
     def prepare_ships(self):
 
-        GAME = self.__GAME
-        DATA     = GAME['DATA']
-        STARS    = DATA['stars']
-
         map_x, map_y, map_width, map_height = 22, 21, 505, 400
 
-        PLAYERS = GAME['DATA']['players']
-        STARS = GAME['DATA']['stars']
-        SHIPS = GAME['DATA']['ships']
-        STARS_BY_COORDS = GAME['DATA']['stars_by_coords']
+        PLAYERS = networking.Client.list_players()
+        STARS    = networking.Client.list_stars()
+        SHIPS = networking.Client.list_ships()
+        STARS_BY_COORDS = networking.Client.list_stars_by_coords()
 
         for ship_id in SHIPS:
             draw = False
@@ -151,15 +155,12 @@ class MainScreen(Screen):
                 self.register_map_item('ships', ship_icon, (ship_icon_x, ship_icon_y))
 
     def draw(self):
-        DISPLAY = self.get_display()
+        DISPLAY = gui.GUI.get_display()
 
-        GAME = self.__GAME
-        DATA     = GAME['DATA']
-        GALAXY   = DATA['galaxy']
-        ME       = DATA['me']
+        ME       = networking.Client.get_me()
 
-        font3 = self.get_font('font3')
-        font4 = self.get_font('font4')
+        font3 = gui.GUI.get_font('font3')
+        font4 = gui.GUI.get_font('font4')
 
         self.reset_triggers_list()
         DISPLAY.blit(self.get_image('background', 'starfield'), (0, 0))
@@ -197,7 +198,7 @@ class MainScreen(Screen):
 
         # stardate
         stardate_palette = [0x0, 0x7c7c84, 0xbcbcc4]
-        font3.write_text(DISPLAY, 561, 29, stardate(GALAXY['stardate']), stardate_palette, 2)
+        font3.write_text(DISPLAY, 561, 29, stardate(networking.Client.get_stardate()), stardate_palette, 2)
 
         # research
         research_palette = [0x0, 0x7c7c84, 0xbcbcc4]
@@ -206,16 +207,12 @@ class MainScreen(Screen):
 
         self.flip()
 
-    def run(self, GAME):
-        GAME['DATA'] = GAME['client'].fetch_game_data()
-
-        if GAME['DATA'] is None:
+    def run(self):
+        if not networking.Client.fetch_game_data():
             self.log_error("no data received in main_screen::run()")
             return
 
-        self.__GAME     = GAME
-        DATA     = GAME['DATA']
-        GALAXY   = DATA['galaxy']
+        GALAXY   = networking.Client.get_galaxy()
 
         galaxy_size_factor = GALAXY['size_factor']
 
@@ -251,15 +248,10 @@ class MainScreen(Screen):
                     self.draw()
 
 		elif action == "newTurn":
-		#           print("=> newTurn ... DATA.keys = %s" % GAME['DATA'].keys()) 
-		#            GAME['DATA'] = 
-		    if GAME['client'].next_turn():
+		    if networking.Client.next_turn():
 			print("# NEXT_TURN succesfully sent")
 			while True:
-			    NEW_DATA = GAME['client'].fetch_game_data()
-			    if NEW_DATA:
-				GAME['DATA'] = NEW_DATA
-#    				self.__GAME     = GAME
+			    if networking.Client.fetch_game_data():
 				self.draw()
 				break
 			    else:
@@ -269,25 +261,27 @@ class MainScreen(Screen):
 		#           print("=> newTurn ... result = %s" % result)
 
                 elif action == "research_screen":
-                    self.get_screen('RESEARCH').run(GAME)
+                    research_screen.Screen.run()
                     self.draw()
 
                 elif action == "colonies_screen":
-                    self.get_screen('COLONIES').run(GAME)
+                    colonies_screen.Screen.run()
                     self.draw()
 
                 elif action == "planets_screen":
-                    self.get_screen('PLANETS').run(GAME)
+                    planets_screen.Screen.run()
                     self.draw()
 
                 elif action == "leaders_screen":
-                    self.get_screen('LEADERS').run(GAME)
+                    leaders_screen.Screen.run()
                     self.draw()
 
                 elif action == "info_screen":
-                    self.get_screen('INFO').run(GAME)
+                    info_screen.Screen.run()
                     self.draw()
 
                 elif action == "show_star_system":
-                    self.get_screen('STARSYSTEM').run(GAME, event['star_id'])
+                    starsystem_screen.Screen.run(event['star_id'])
                     self.draw()
+
+Screen = MainScreen()

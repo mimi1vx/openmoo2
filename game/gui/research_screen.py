@@ -1,24 +1,24 @@
 import pygame
-from screen import Screen
 
-class ResearchScreen(Screen):
+import screen
+import networking
+import gui
 
-    def __init__(self, ui):
-        Screen.__init__(self, ui)
+class ResearchScreen(screen.Screen):
+
+    def __init__(self):
+        screen.Screen.__init__(self)
 
     def draw(self, hover):
-        GAME = self.__GAME
-
-        DISPLAY     = self.get_display()
+        DISPLAY = gui.GUI.get_display()
 
         DISPLAY.blit(self.get_image('research_screen', 'panel'), (80, 0))
 
-        DATA        = GAME['DATA']
-        RULES       = DATA['rules']
-        ME          = DATA['me']
+        RULES = networking.Client.rules()
+        ME = networking.Client.get_me()
 
-        font4 = self.get_font('font4')
-        font5 = self.get_font('font5')
+        font4 = gui.GUI.get_font('font4')
+        font5 = gui.GUI.get_font('font5')
 
         self.reset_triggers_list()
 
@@ -62,8 +62,8 @@ class ResearchScreen(Screen):
 
         self.flip()
 
-    def run(self, GAME):
-        self.__GAME = GAME
+    def run(self):
+        ME = networking.Client.get_me()
         hover = None
         self.draw(hover)
         while True:
@@ -84,7 +84,10 @@ class ResearchScreen(Screen):
                 elif action == "set_research":
                     tech_id = event['tech_id']
 #                    print(">>> set_research ... tech_id = %i = %s" % (tech_id, RULES['tech_table'][tech_id]['name']))
-                    GAME['DATA']['me'].print_research_debug()
-                    GAME['DATA'] = GAME['client'].set_research(tech_id)
-                    GAME['DATA']['me'].print_research_debug()
+                    ME.print_research_debug()
+                    networking.Client.set_research(tech_id)
+                    ME.print_research_debug()
                     return
+
+
+Screen = ResearchScreen()

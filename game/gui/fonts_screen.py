@@ -2,8 +2,8 @@ import screen
 
 class FontsScreen(screen.Screen):
 
-    def __init__(self, ui):
-        screen.Screen.__init__(self, ui)
+    def __init__(self):
+        screen.Screen.__init__(self)
         self.reset_triggers_list()
 
     def draw(self):

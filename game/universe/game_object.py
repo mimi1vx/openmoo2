@@ -1,4 +1,4 @@
-class GameObject():
+class GameObject(object):
 
     def set_id(self, id):
         self.__id = id

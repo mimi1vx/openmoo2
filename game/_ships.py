@@ -6,7 +6,7 @@ TITAN_SHIP	= 4
 DOOMSTAR_SHIP	= 5
 
 
-// values for ship type field:
+# values for ship type field:
 COMBAT_SHIP_TYPE	= 0
 COLONY_SHIP_TYPE	= 1
 TRANSPORT_SHIP_TYPE	= 2

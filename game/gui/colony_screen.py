@@ -1,17 +1,21 @@
 import pygame
-from screen import Screen
-
-from game import stardate
+import screen
 
 from _game_constants import *
 
-class ColonyScreen(Screen):
+import networking
+import gui
+import dictionary
 
-    def __init__(self, ui):
-        Screen.__init__(self, ui)
+import colony_build_screen
+
+class ColonyScreen(screen.Screen):
+
+    def __init__(self):
+        screen.Screen.__init__(self)
 
     def reset_triggers_list(self):
-        Screen.reset_triggers_list(self)
+        screen.Screen.reset_triggers_list(self)
         self.add_trigger({'action': "ESCAPE",    	'rect': pygame.Rect((556, 459), ( 72, 20))})
         self.add_trigger({'action': "leaders",   	'rect': pygame.Rect((556, 427), ( 72, 20))})
         self.add_trigger({'action': "buy",       	'rect': pygame.Rect((590, 123), ( 37, 22))})
@@ -22,18 +26,17 @@ class ColonyScreen(Screen):
         self.add_trigger({'action': "research_summary",	'rect': pygame.Rect((127, 121), (177, 25))})
 
     def draw(self, star, planet, colony):
-        DISPLAY         = self.get_display()
-        GAME            = self.__GAME
-        DICTIONARY	= GAME['DICTIONARY']
-        PLAYERS         = GAME['DATA']['players']
-        PLANETS         = GAME['DATA']['planets']
+        DISPLAY = gui.GUI.get_display()
+        DICTIONARY = dictionary.get_dictionary()
+        PLAYERS = networking.Client.list_players()
+        PLANETS = networking.Client.list_planets()
         
-        font2 = self.get_font('font2')
-        font3 = self.get_font('font3')
-        font5 = self.get_font('font5')
+        font2 = gui.GUI.get_font('font2')
+        font3 = gui.GUI.get_font('font3')
+        font5 = gui.GUI.get_font('font5')
 
         DISPLAY.blit(self.get_image('background', 'starfield'), (0, 0))
-        DISPLAY.blit(self.get_ui().get_planet_background(planet.get_terrain(), planet.get_picture()), (0, 0))
+        DISPLAY.blit(gui.GUI.get_planet_background(planet.get_terrain(), planet.get_picture()), (0, 0))
         DISPLAY.blit(self.get_image('colony_screen', 'panel'), (0, 0))
 
         colony_id = colony.get_id()
@@ -167,22 +170,18 @@ class ColonyScreen(Screen):
 
         self.flip()
 
-    def run(self, GAME, colony_id):
-    #    draw(GAME)
-        self.__GAME = GAME
-        DATA	= GAME['DATA']
-
+    def run(self, colony_id):
 
         print
         print "@@@ colony_screen @@@"
 
-        colony      = DATA['colonies'][colony_id]
+        colony = networking.Client.get_colony(colony_id)
 
-        planet_id	= colony.get_planet_id()
-        planet      = DATA['planets'][planet_id]
+        planet_id = colony.get_planet_id()
+        planet = networking.Client.get_planet(planet_id)
 
         star_id	= planet.get_star()
-        star	= DATA['stars'][star_id]
+        star = networking.Client.get_star(star_id)
 
         for build_item in colony.get_build_queue():
             print "colony_screen::run() ... colony.build_queue[] = %s" % build_item
@@ -223,9 +222,12 @@ class ColonyScreen(Screen):
                     self.draw(star, planet, colony)
 
                 elif action == "change_build":
-                    self.get_screen('COLONY_BUILD').run(GAME, event['colony_id'])
+                    colony_build_screen.Screen.run(event['colony_id'])
                     self.draw(star, planet, colony)
 
                 else:
                     print "UNKNOWN ACTION: " + action
 
+
+
+Screen = ColonyScreen()
