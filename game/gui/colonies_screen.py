@@ -4,18 +4,15 @@ import screen
 import networking
 import gui
 
-import colony_screen
-import colony_build_screen
-
 class ColoniesScreen(screen.Screen):
+
+    __view_size = 10
+
+    __list_start = 0
+    __list_size  = 0
 
     def __init__(self):
         screen.Screen.__init__(self)
-
-        self.__view_size = 10
-
-        self.__list_start = 0
-        self.__list_size  = 0
 
     def reset_triggers_list(self):
         screen.Screen.reset_triggers_list(self)
@@ -32,7 +29,8 @@ class ColoniesScreen(screen.Screen):
 
         DISPLAY = gui.GUI.get_display()
 
-        DISPLAY.blit(self.get_image('colonies_screen', 'panel'), (0, 0))
+#        DISPLAY.blit(self.get_image('colonies_screen', 'panel'), (0, 0))
+	gui.GUI.draw_image_by_key('colonies_screen.panel', (0, 0))
 
         font2 = gui.GUI.get_font('font2')
         font3 = gui.GUI.get_font('font3')
@@ -63,7 +61,7 @@ class ColoniesScreen(screen.Screen):
 
             y = 38 + (31 * (i - self.__list_start))
 
-            self.add_trigger({'action': "colony", 'colony_id': colony_id, 'rect': pygame.Rect((12, y), (85, 24))})
+            self.add_trigger({'action': "screen", 'screen': "colony", 'colony_id': colony_id, 'rect': pygame.Rect((12, y), (85, 24))})
 
             # production
             build_item = colony.get_build_item()
@@ -72,7 +70,7 @@ class ColoniesScreen(screen.Screen):
                 production_name = RULES['buildings'][production_id]['name']
                 font2.write_text(DISPLAY, 512, y, production_name, [0x0, 0x141420, 0x6c688c], 1)
 
-            self.add_trigger({'action': "colony_build", 'colony_id': colony_id, 'rect': pygame.Rect((513, y), (85, 24))})
+            self.add_trigger({'action': "screen", 'screen': "colony_production", 'colony_id': colony_id, 'rect': pygame.Rect((513, y), (85, 24))})
 
 #            DISPLAY.blit(FONTS['font_10'].render(colony.get_name(), 1, (0x80, 0xA0, 0xBC)), (12, y + 6))
             font3.write_text(DISPLAY, 12, y + 5, colony.get_name(), [0x0, 0x141420, 0x6c688c], 2)
@@ -99,41 +97,34 @@ class ColoniesScreen(screen.Screen):
                     race = colonist['race']
                     picture = PLAYERS[race].get_picture()
 #                    DISPLAY.blit(self.get_ui().get_race_icon(picture, icon), (x + (xx * ii), y))
-                    DISPLAY.blit(self.get_image('race_icon', picture, icon), (x + (xx * ii), y))
+#                    DISPLAY.blit(self.get_image('race_icon', picture, icon), (x + (xx * ii), y))
+		    gui.GUI.draw_image_by_key('race_icon.%i.%i' % (picture, icon), (x + (xx * ii), y))
 
-        self.flip()
+    def scroll_up(self, step = 1):
+        print("@ colonies_screen.scroll_up()")
+        old_start = self.__list_start
+        self.__list_start = max(0, self.__list_start - step)
+        print("    self.__list_start = %i" % self.__list_start)
+        if old_start != self.__list_start:
+	    self.redraw_flip()
+        print("/ colonies_screen.scroll_up()")
 
-    def run(self):
-        self.draw()
+    def scroll_down(self, step = 1):
+        print("@ colonies_screen.scroll_down()")
+        old_start = self.__list_start
+        self.__list_start = min(self.__list_start + step, self.__list_size - self.__view_size + 1)
+	print("    self.__list_start = %i" % self.__list_start)
+        if old_start != self.__list_start:
+	    self.redraw_flip()
+        print("/ colonies_screen.scroll_down()")
 
-        while True:
-            event = self.get_event()
-            if event:
-                action = event['action']
+    def process_trigger(self, trigger):
 
-                if action == "ESCAPE":
-                    return
+        if trigger['action'] == "SCROLL_UP":
+            self.scroll_up()
 
-                elif action == "hover":
-                    pass
-
-                elif action == "SCROLL_UP":
-                    if self.__list_start > 0:
-                        self.__list_start -= 1
-                        self.draw()
-
-                elif action == "SCROLL_DOWN":
-                    if self.__list_start < (self.__list_size - self.__view_size):
-                        self.__list_start += 1
-                        self.draw()
-
-                elif action == "colony":
-                    colony_screen.Screen.run(event['colony_id'])
-                    self.draw()
-
-                elif action == "colony_build":
-                    colony_build_screen.Screen.run(event['colony_id'])
-                    self.draw()
+        if trigger['action'] == "SCROLL_DOWN":
+            self.scroll_down()
 
 
 Screen = ColoniesScreen()

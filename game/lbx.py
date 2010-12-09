@@ -158,9 +158,6 @@ def moo2_draw_image_frame(surface, picture, frame, localPalette, x=0, y=0, DEBUG
                     Y += yIndent
                     X = x
                 else:
-#					pygame.display.flip()
-#					pos = 999999999
-#                    print
                     return
 
 # end func moo2_draw_image_frame

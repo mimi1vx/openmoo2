@@ -1,29 +1,49 @@
 import pygame
-import screen
 
+import screen
 import networking
 import gui
 
-import colony_screen
-
 from dictionary import greek_num
+
+import main_screen
 
 class StarsystemScreen(screen.Screen):
 
+    __panel_moved = False
+    __panel_x_min = 22
+    __panel_x_max = 180
+    __panel_y_min = 22
+    __panel_y_max = 148
+
+    __panel_x = 106
+    __panel_y = 103
+
     def __init__(self):
-        self.__panel_x, self.__panel_y = 106, 103
-
-        self.__panel_x_min = 22
-        self.__panel_x_max = 180
-        self.__panel_y_min = 22
-        self.__panel_y_max = 148
-
         screen.Screen.__init__(self)
 
+    def __check_panel_moved(self):
+        """Returns True if panel's position has changed and resets the moved flag"""
+        if self.__panel_moved:
+            self.__panel_moved = False
+            return True
+        else:
+            return False
+
+    def open_star(self, star_id):
+        """Stores the id of a star system which is going to be displayed on this screen"""
+        self.__star_id = star_id
+
     def get_normalized_panel_pos(self, (x, y)):
+        """Returns panel position within allowed ranges to prevent escaping the main window boundaries"""
         return (min(max(x, self.__panel_x_min), self.__panel_x_max), min(max(y, self.__panel_y_min), self.__panel_y_max))
 
+    def prepare(self):
+        """Copy the actual content of MainScreen, it is used on each redraw"""
+        self.__BACKGROUND = gui.GUI.get_display().copy()
+
     def draw_planet_info(self, text_rows):
+        """Draws a semi-transparent minibox in the upper-left corner of the dialog window"""
         DISPLAY = gui.GUI.get_display()
         font3 = gui.GUI.get_font('font3')
         info_palette = [0x0, 0x181c40, 0x688cb0]
@@ -48,7 +68,11 @@ class StarsystemScreen(screen.Screen):
             DISPLAY.blit(row, (info_x + 4, y))
             y += 13
 
-    def draw(self, star_id, hover):
+    def draw(self):
+        """Draws the background, starsystem dialog window, planets/asteroids orbit schemes, planets picturesand central star picture"""
+        print("@ starsystem_screen.draw()")
+        star_id = self.__star_id
+        hover = self.get_hover()
         DISPLAY = gui.GUI.get_display()
 
         title_shadow_palette = [0x0, 0x181c40, 0x20284c, 0x20284c]
@@ -65,7 +89,7 @@ class StarsystemScreen(screen.Screen):
         X, Y = self.get_normalized_panel_pos((self.__panel_x, self.__panel_y))
 
         self.add_trigger({'action': "ESCAPE", 'hover_id': "escape_button", 'rect': pygame.Rect((X + 264, Y + 239), (64, 19))})
-        self.add_trigger({'action': "drag", 'rect': pygame.Rect((X + 14, Y + 12), (319, 26))})
+        self.add_trigger({'action': "drag", 'drag_id': "window_title", 'rect': pygame.Rect((X + 14, Y + 12), (319, 26))})
 
         DISPLAY.blit(self.__BACKGROUND, (0, 0))
 
@@ -82,31 +106,29 @@ class StarsystemScreen(screen.Screen):
         DISPLAY.blit(title, (X + 173 - (tw / 2), Y + 19))
 
         if star.visited():
-            for i in range(5):
-                planet_id = star.get_objects()[i]
-                if planet_id != 0xffff:
-                    planet = networking.Client.get_planet(planet_id)
-                    if planet.is_asteroid_belt():
-                        if i == 0:
-                            DISPLAY.blit(self.get_image('starsystem_map', 'asteroids', i), (X + 29, Y + 59))
-                    elif planet.is_gas_giant():
-                        DISPLAY.blit(self.get_image('starsystem_map', 'orbit', i), (X + 29, Y + 59))
-                    elif planet.is_planet():
-                        DISPLAY.blit(self.get_image('starsystem_map', 'orbit', i), (X + 29, Y + 59))
-                    else:
-#                        print("WARNING: unknow star system object detected: %i" % (planet.get_type()))
-                        pass
 
             DISPLAY.blit(self.get_image('starsystem_map', 'star', star.get_class()), (X + 156, Y + 120))
 
+            show_info = None
+
             for i in range(5):
                 planet_id = star.get_objects()[i]
                 if planet_id != 0xffff:
                     planet = networking.Client.get_planet(planet_id)
 
+                    # draw a planet/asteroid orbit scheme first
+                    if planet.is_asteroid_belt():
+                        if i == 0:
+                            # FIXME: where are the asteroid belts for objects 1~4 ?
+                            DISPLAY.blit(self.get_image('starsystem_map', 'asteroids', i), (X + 29, Y + 59))
+                    elif planet.is_planet() or planet.is_gas_giant():
+                        DISPLAY.blit(self.get_image('starsystem_map', 'orbit', i), (X + 29, Y + 59))
+
                     x = X + 200 + (25 * i) + (5 - planet.get_size())
                     y = Y + 121 + (5 - planet.get_size())
+                    print("    hover = %s" % str(hover))
                     hover_id = "planet_%i" % planet_id
+                    print("    hover_id = %s" % hover_id)
 
                     planet_size = planet.get_size()
 
@@ -120,8 +142,8 @@ class StarsystemScreen(screen.Screen):
                         planet_rect = pygame.Rect((x, y), (w, h))
                         DISPLAY.blit(planet_image, (x, y))
                         self.add_trigger({'action': "gas_giant", 'planet_id': planet_id, 'hover_id': hover_id, 'rect': planet_rect})
-                        if hover and hover['hover_id'] == hover_id:
-                            planet_info.append("Gas Giant (uninhabitable)")
+#                        if hover and hover['hover_id'] == hover_id:
+                        planet_info.append("Gas Giant (uninhabitable)")
 
                     elif planet.is_planet():
                         planet_image = self.get_image('starsystem_map', 'planet', planet.get_terrain(), planet_size)
@@ -142,7 +164,7 @@ class StarsystemScreen(screen.Screen):
                             player = networking.Client.get_player(colony.get_owner())
 
                             if colony.is_owned_by(ME.get_id()) and colony.is_colony():
-                                self.add_trigger({'action': "colony", 'colony_id': colony_id, 'hover_id': hover_id, 'rect': planet_rect})
+                                self.add_trigger({'action': "screen", 'screen': "colony", 'colony_id': colony_id, 'hover_id': hover_id, 'rect': planet_rect})
                                 planet_info.append("%i / %i pop" % (colony.get_population(), colony.max_population()))
                             else:
                                 self.add_trigger({'action': "enemy_colony", 'hover_id': hover_id, 'rect': planet_rect})
@@ -159,54 +181,29 @@ class StarsystemScreen(screen.Screen):
 
                         planet_info.append("%s" % (planet.minerals_text()))
 
-                        if hover and hover['hover_id'] == hover_id:
-                            self.draw_planet_info(planet_info)
+                        # set the info-box content if hover machtes
+                    if hover and hover['hover_id'] == hover_id:
+                        show_info = planet_info
 
-        self.flip()
+            # finaly render the on-hover info-box so it's not over-drawed by a planet otbit schemes
+            if show_info:
+                self.draw_planet_info(show_info)
 
-    def run(self, star_id):
-        hover = None
+    def animate(self):
+	"""Redraws the draggable panel"""
+        if self.hover_changed() or self.__check_panel_moved():
+            self.redraw_noflip()
 
-        self.__BACKGROUND = gui.GUI.get_display().copy()
+    def on_mousedrag(self, drag_item, (mouse_x, mouse_y), (rel_x, rel_y)):
+        """Updates the panel position and sets the moved flag"""
+        self.__panel_x += rel_x
+	self.__panel_y += rel_y
+        self.__panel_moved = True
 
-        drag = False
-        mouse_rel_x, mouse_rel_y = 0, 0
+    def on_mousedrop(self, drag_item, (mouse_x, mouse_y)):
+	"""Just reset the panel position so next time drag will not be affected by out-of border position"""
+        self.__panel_x, self.__panel_y = self.get_normalized_panel_pos((self.__panel_x, self.__panel_y))
 
-        while True:
-            event = self.get_event()
-            if event:
-                action = event['action']
-
-                if action == "redraw":
-                    self.draw(star_id, hover)
-
-                elif action == "left_mouse_up" and drag:
-                    drag = False
-                    self.__panel_x, self.__panel_y = self.get_normalized_panel_pos((self.__panel_x, self.__panel_y))
-                    print("Panel dropped")
-
-                elif action == "drag":
-                    drag = True
-                    mouse_rel_x = event['mouse_pos'][0] - self.__panel_x
-                    mouse_rel_y = event['mouse_pos'][1] - self.__panel_y
-                    print("Panel dragged")
-
-                elif action == "hover":
-                    if hover != event['hover']:
-                        hover = event['hover']
-
-                if (action == "hover") or (action == "MOUSEMOTION"):
-                    if drag:
-                        self.__panel_x = event['mouse_pos'][0] - mouse_rel_x
-                        self.__panel_y = event['mouse_pos'][1] - mouse_rel_y
-                
-                elif action == "ESCAPE":
-                    return
-
-                elif action == "colony":
-                    colony_screen.Screen.run(event['colony_id'])
-                    self.get_screen('MAIN').draw()
-                    self.draw(star_id, hover)
 
 
 Screen = StarsystemScreen()

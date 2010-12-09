@@ -73,18 +73,5 @@ class InfoScreen(screen.Screen):
                     y += 13
                 y += 6
 
-        self.flip()
-
-    def run(self):
-        self.draw()
-
-        while True:
-            event = self.get_event()
-            if event:
-                action = event['action']
-
-                if action == "ESCAPE":
-                    return
-
 
 Screen = InfoScreen()

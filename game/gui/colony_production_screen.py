@@ -9,17 +9,30 @@ from _buildings import *
 import networking
 import gui
 
-class ColonyBuildScreen(screen.Screen):
+class ColonyProductionScreen(screen.Screen):
 
     def __init__(self):
         screen.Screen.__init__(self)
+
+    def open_colony(self, colony_id):
+        self.__colony_id = colony_id
+        self.__colony = networking.Client.get_colony(colony_id)
+
+        self.__planet_id = self.__colony.get_planet_id()
+        self.__planet = networking.Client.get_planet(self.__planet_id)
+
+        self.__star_id	= self.__planet.get_star()
+        self.__star = networking.Client.get_star(self.__star_id)
 
     def reset_triggers_list(self):
         screen.Screen.reset_triggers_list(self)
         self.add_trigger({'action': "ESCAPE", 'hover_id': "ESCAPE", 'rect': pygame.Rect((496, 448), (56, 16))})
 
-    def draw(self, star, planet, colony):
+    def draw(self):
         DISPLAY = gui.GUI.get_display()
+        star = self.__star
+        planet = self.__planet
+        colony = self.__colony
 
         RULES = networking.Client.rules()
         PROTOTYPES = networking.Client.list_prototypes()
@@ -149,7 +162,6 @@ class ColonyBuildScreen(screen.Screen):
 
         print("=== /Build Queue ===")
 
-        self.flip()
         return
 
         print("")
@@ -194,37 +206,7 @@ class ColonyBuildScreen(screen.Screen):
         print("=== /Build Queue: ===")
         print("")
 
-        pygame.display.flip()
 
 
 
-    # end func draw
-
-    #
-    #       RUN
-    #
-    def run(self, colony_id):
-        colony = networking.Client.get_colony(colony_id)
-
-        planet_id = colony.get_planet_id()
-        planet = networking.Client.get_planet(planet_id)
-
-        star_id	= planet.get_star()
-        star = networking.Client.get_star(star_id)
-
-        self.draw(star, planet, colony)
-
-        while True:
-            event = self.get_event()
-            if event:
-                action = event['action']
-
-                if action == "ESCAPE":
-                    return
-
-                if action == "hover":
-                    print("hover = %s" % event['hover'])
-
-
-
-Screen = ColonyBuildScreen()
+Screen = ColonyProductionScreen()

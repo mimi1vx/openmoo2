@@ -9,7 +9,8 @@ class ResearchScreen(screen.Screen):
     def __init__(self):
         screen.Screen.__init__(self)
 
-    def draw(self, hover):
+    def draw(self):
+        hover = self.get_hover()
         DISPLAY = gui.GUI.get_display()
 
         DISPLAY.blit(self.get_image('research_screen', 'panel'), (80, 0))
@@ -60,34 +61,14 @@ class ResearchScreen(screen.Screen):
                 self.add_trigger({'action': "set_research", 'tech_id': tech_id, 'rect': pygame.Rect((x, y + yy), label.get_size())})
                 i += 1
 
-        self.flip()
+    def process_trigger(self, trigger):
+        print("@ research_screen::trigger()")
+        print("    %s" % trigger)
 
-    def run(self):
-        ME = networking.Client.get_me()
-        hover = None
-        self.draw(hover)
-        while True:
-            event = self.get_event()
-            if event:
-                action = event['action']
-
-                if action == "ESCAPE":
-                    return
-
-                elif action == "redraw":
-                    self.draw(hover)
-
-                elif action == "hover":
-                    if hover != event['hover']:
-                        hover = event['hover']
-
-                elif action == "set_research":
-                    tech_id = event['tech_id']
-#                    print(">>> set_research ... tech_id = %i = %s" % (tech_id, RULES['tech_table'][tech_id]['name']))
-                    ME.print_research_debug()
-                    networking.Client.set_research(tech_id)
-                    ME.print_research_debug()
-                    return
+        if trigger['action'] == "set_research":
+            tech_id = trigger['tech_id']
+            networking.Client.set_research(tech_id)
+            return self.get_escape_trigger()
 
 
 Screen = ResearchScreen()

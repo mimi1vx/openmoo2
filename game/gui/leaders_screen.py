@@ -173,29 +173,14 @@ class LeadersScreen(screen.Screen):
                 font4.write_text(DISPLAY, 116, y + 4, skill[1], common_palette, 1)
                 skill_row += 1
 
-        self.flip()
+    def process_trigger(self, trigger):
+        if trigger['action'] == "showColonyLeaders" and self.__type == 0:
+            self.__type = 1
+            self.redraw_flip()
 
-    ##
-    #       RUN
-    ##
-    def run(self):
-        self.draw()
-
-        while True:
-            event = self.get_event()
-            if event:
-                action = event['action']
-
-                if action == "ESCAPE":
-                    break
-
-                elif (action == "showColonyLeaders") and (self.__type == 0):
-                    self.__type = 1
-                    self.draw()
-
-                elif (action == "showShipOfficers") and (self.__type == 1):
-                    self.__type = 0
-                    self.draw()
+        elif trigger['action'] == "showShipOfficers" and self.__type == 1:
+            self.__type = 0
+            self.redraw_flip()
 
 
 Screen = LeadersScreen()

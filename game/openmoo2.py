@@ -64,9 +64,10 @@ def main(argv):
     gui.GUI.init(MOO2_DIR)
 
     pygame.mouse.set_visible(False)
-    gui.Input().set_display(pygame.display.get_surface())
+#    gui.Input().set_display(pygame.display.get_surface())
 
-    gui.splash_screen.Screen.run()
+    gui.splash_screen.Screen.draw()
+    gui.GUI.flip()
 
     networking.Client.connect(HOST, PORT, SOCKET_BUFFER_SIZE)
     networking.Client.login(PLAYER_ID)
@@ -89,7 +90,7 @@ def main(argv):
 
 #    CLIENT.ping()
 
-    gui.main_screen.Screen.run()
+    gui.GUI.run()
 
     networking.Client.disconnect()
 # end func main

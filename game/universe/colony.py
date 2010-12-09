@@ -385,12 +385,16 @@ class Colony(GameObject):
             self.__build_queue.pop(build_queue_ids.index(production_id))
 
     def get_build_item(self):
-        if self.__build_queue[0]['production_id'] == 0xFF:
-            return None
-        elif self.__build_queue[0]['production_id'] == 249:  # repeat
-            return self.__build_queue[1]
+        if len(self.__build_queue) > 0:
+            if self.__build_queue[0]['production_id'] == 0xFF:
+                return None
+            elif self.__build_queue[0]['production_id'] == 249:  # repeat
+                return self.__build_queue[1]
+            else:
+                return self.__build_queue[0]
+
         else:
-            return self.__build_queue[0]
+            return None
 
     """
         get_agregated_populations

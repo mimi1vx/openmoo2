@@ -1,18 +1,22 @@
 import pygame
+
 import pygame_ext
 import screen
-
-from game import stardate
-
 import networking
 import gui
 
-import colonies_screen
-import planets_screen
-import leaders_screen
-import info_screen
-import starsystem_screen
-import research_screen
+from game import stardate
+
+ship_tracks_bitmaps = (
+    [0x001400, 0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804],
+    [0x043804, 0x001400, 0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008],
+    [0x087008, 0x043804, 0x001400, 0x001400, 0x043804, 0x087008, 0x489038, 0x489038],
+    [0x489038, 0x087008, 0x043804, 0x001400, 0x001400, 0x043804, 0x087008, 0x489038],
+    [0x489038, 0x489038, 0x087008, 0x043804, 0x001400, 0x001400, 0x043804, 0x087008],
+    [0x087008, 0x489038, 0x489038, 0x087008, 0x043804, 0x001400, 0x001400, 0x043804],
+    [0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804, 0x001400, 0x001400],
+    [0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804, 0x001400]
+)
 
 class MainScreen(screen.Screen):
 
@@ -22,16 +26,17 @@ class MainScreen(screen.Screen):
         self.__map_y = 21
         self.__map_width = 505
         self.__map_height = 400
+	self.__tick = None
 
     def reset_triggers_list(self):
         screen.Screen.reset_triggers_list(self)
-        self.add_trigger({'action': "game_menu",        'rect': pygame.Rect((255,   8), (50, 12))})
-        self.add_trigger({'action': "colonies_screen",	'rect': pygame.Rect(( 20, 431), (65, 38)), 'key': 99}) # C key
-        self.add_trigger({'action': "leaders_screen",	'rect': pygame.Rect((315, 431), (65, 38)), 'key': 108}) # L key
-        self.add_trigger({'action': "info_screen",	'rect': pygame.Rect((460, 431), (65, 38)), 'key': 105}) # I key
-        self.add_trigger({'action': "research_screen",	'rect': pygame.Rect((547, 347), (64, 66))})
+        self.add_trigger({'action': "screen", 'screen': "game_menu",        'rect': pygame.Rect((255,   8), (50, 12))})
+        self.add_trigger({'action': "screen", 'screen': "colonies",	'rect': pygame.Rect(( 20, 431), (65, 38)), 'key': 99}) # C key
+        self.add_trigger({'action': "screen", 'screen': "leaders",	'rect': pygame.Rect((315, 431), (65, 38)), 'key': 108}) # L key
+        self.add_trigger({'action': "screen", 'screen': "info",	'rect': pygame.Rect((460, 431), (65, 38)), 'key': 105}) # I key
+        self.add_trigger({'action': "screen", 'screen': "research",	'rect': pygame.Rect((547, 347), (64, 66))})
         self.add_trigger({'action': "newTurn",		'rect': pygame.Rect((547, 444), (59, 19))})
-        self.add_trigger({'action': "planets_screen",    'rect': pygame.Rect((93, 431), (65, 38)), 'key': 112}) # P key
+        self.add_trigger({'action': "screen", 'screen': "planets",    'rect': pygame.Rect((93, 431), (65, 38)), 'key': 112}) # P key
 
     def get_pos(self, (x, y)):
         pos_x = self.__map_x + ((x * self.__map_width) / self.__galaxy_width)
@@ -87,7 +92,7 @@ class MainScreen(screen.Screen):
             if star_class < 7:
                 xx = pic_width / 2
                 yy = pic_height / 2
-                self.add_trigger({'action': "show_star_system", 'star_id': star.get_id(), 'rect': pygame.Rect((x - xx + 3, y - yy + 3), (pic_width - 6, pic_height - 6))})
+                self.add_trigger({'action': "screen", 'screen': "starsystem", 'star_id': star.get_id(), 'rect': pygame.Rect((x - xx + 3, y - yy + 3), (pic_width - 6, pic_height - 6))})
                 self.register_map_item('stars', star_icon, (x - xx, y - yy))
 
             # name
@@ -163,38 +168,13 @@ class MainScreen(screen.Screen):
         font4 = gui.GUI.get_font('font4')
 
         self.reset_triggers_list()
-        DISPLAY.blit(self.get_image('background', 'starfield'), (0, 0))
-        DISPLAY.blit(self.get_image('main_screen', 'panel'), (0, 0))
+	gui.GUI.draw_image_by_key('background.starfield', (0, 0))
+	gui.GUI.draw_image_by_key('main_screen.panel', (0, 0))
 
         # main screen draws a lot of objects in "layers" so map images are prepared first and draw in groups after that
         self.clear_map_items()
         self.prepare_ships()
         self.prepare_stars()
-
-        ship_tracks_bitmaps = (
-            [0x001400, 0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804],
-            [0x043804, 0x001400, 0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008],
-            [0x087008, 0x043804, 0x001400, 0x001400, 0x043804, 0x087008, 0x489038, 0x489038],
-            [0x489038, 0x087008, 0x043804, 0x001400, 0x001400, 0x043804, 0x087008, 0x489038],
-            [0x489038, 0x489038, 0x087008, 0x043804, 0x001400, 0x001400, 0x043804, 0x087008],
-            [0x087008, 0x489038, 0x489038, 0x087008, 0x043804, 0x001400, 0x001400, 0x043804],
-            [0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804, 0x001400, 0x001400],
-            [0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804, 0x001400]
-        )
-
-        ts = self.get_timestamp(20)
-
-        for wormhole in self.__map_items['wormholes']:
-            pygame_ext.draw_line(DISPLAY, wormhole['pos1'], wormhole['pos2'], [0x444444])
-
-        for ship_track in self.__map_items['ship_tracks']:
-            pygame_ext.draw_line(DISPLAY, ship_track['pos1'], ship_track['pos2'], ship_tracks_bitmaps[ts % 8])
-
-        for star in self.__map_items['stars']:
-            DISPLAY.blit(star['img'], star['pos1'])
-
-        for ship in self.__map_items['ships']:
-            DISPLAY.blit(ship['img'], ship['pos1'])
 
         # stardate
         stardate_palette = [0x0, 0x7c7c84, 0xbcbcc4]
@@ -205,14 +185,32 @@ class MainScreen(screen.Screen):
         font4.write_text(DISPLAY, 552, 380, "~%s turns" % ME.get_research_turns_left(), research_palette, 2)
         font4.write_text(DISPLAY, 552, 400, "%i RP" % ME.get_research(), research_palette, 2)
 
-        self.flip()
+    def animate(self):
+        ts = self.get_timestamp(20)
+	tick = ts % 8
+	if self.__tick != tick:
+#            print("@ main_screen.animate() ... TICK")
+	    self.__tick = tick
+            DISPLAY = gui.GUI.get_display()
+            for wormhole in self.__map_items['wormholes']:
+                pygame_ext.draw_line(DISPLAY, wormhole['pos1'], wormhole['pos2'], [0x444444])
 
-    def run(self):
-        if not networking.Client.fetch_game_data():
-            self.log_error("no data received in main_screen::run()")
-            return
+            for ship_track in self.__map_items['ship_tracks']:
+                pygame_ext.draw_line(DISPLAY, ship_track['pos1'], ship_track['pos2'], ship_tracks_bitmaps[tick])
 
-        GALAXY   = networking.Client.get_galaxy()
+            for star in self.__map_items['stars']:
+		gui.GUI.draw_image(star['img'], star['pos1'])
+
+            for ship in self.__map_items['ships']:
+		gui.GUI.draw_image(ship['img'], ship['pos1'])
+
+            return True
+
+        else:
+            return False
+
+    def start(self):
+        GALAXY = networking.Client.get_galaxy()
 
         galaxy_size_factor = GALAXY['size_factor']
 
@@ -231,57 +229,27 @@ class MainScreen(screen.Screen):
         else:
             self.__zoom_level = 0
 
-        self.draw()
-        self.set_redraw_screen_timer(50)
+    def on_key_down(self, scancode, key):
+        if key == 99:
+            gui.GUI.run_screen(colonies_screen.Screen)
+            return True
+        if key == 112:
+            gui.GUI.run_screen(planets_screen.Screen)
+            return True
+        if key == 108:
+            gui.GUI.run_screen(leaders_screen.Screen)
+            return True
+        if key == 105:
+            gui.GUI.run_screen(info_screen.Screen)
+            return True
+        return False
 
-        self.set_mouse_cursor(self.get_image('mouse_cursor', 'default'))
 
-        while True:
-            event = self.get_event()
-            if event:
-                action = event['action']
+    def process_trigger(self, trigger):
+        pass
+        if trigger['action'] == "colonies_screen":
+            gui.GUI.run_screen(colonies_screen.Screen)
+            return "screen"
 
-                if action == "QUIT":
-                    break
-
-                elif action == "redraw":
-                    self.draw()
-
-		elif action == "newTurn":
-		    if networking.Client.next_turn():
-			print("# NEXT_TURN succesfully sent")
-			while True:
-			    if networking.Client.fetch_game_data():
-				self.draw()
-				break
-			    else:
-				print("ERROR: received None from GameClient::next_turn()")
-		    else:
-			print("! ERROR: NEXT_TURN sent failed?")
-		#           print("=> newTurn ... result = %s" % result)
-
-                elif action == "research_screen":
-                    research_screen.Screen.run()
-                    self.draw()
-
-                elif action == "colonies_screen":
-                    colonies_screen.Screen.run()
-                    self.draw()
-
-                elif action == "planets_screen":
-                    planets_screen.Screen.run()
-                    self.draw()
-
-                elif action == "leaders_screen":
-                    leaders_screen.Screen.run()
-                    self.draw()
-
-                elif action == "info_screen":
-                    info_screen.Screen.run()
-                    self.draw()
-
-                elif action == "show_star_system":
-                    starsystem_screen.Screen.run(event['star_id'])
-                    self.draw()
 
 Screen = MainScreen()

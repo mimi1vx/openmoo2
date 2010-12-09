@@ -8,10 +8,8 @@ class SplashScreen(screen.Screen):
         screen.Screen.__init__(self)
 
     def draw(self):
-        gui.GUI.get_display().blit(self.get_image('splash_screen'), (0, 0))
-        self.flip()
+	gui.GUI.draw_image_by_key('splash_screen', (0, 0))
 
-    def run(self):
-        self.draw()
+
 
 Screen = SplashScreen()

@@ -7,25 +7,35 @@ import networking
 import gui
 import dictionary
 
-import colony_build_screen
+import text_box
 
 class ColonyScreen(screen.Screen):
 
     def __init__(self):
         screen.Screen.__init__(self)
 
+    def open_colony(self, colony_id):
+        self.__colony_id = colony_id
+        self.__colony = networking.Client.get_colony(colony_id)
+
+        self.__planet_id = self.__colony.get_planet_id()
+        self.__planet = networking.Client.get_planet(self.__planet_id)
+
+        self.__star_id	= self.__planet.get_star()
+        self.__star = networking.Client.get_star(self.__star_id)
+
     def reset_triggers_list(self):
         screen.Screen.reset_triggers_list(self)
         self.add_trigger({'action': "ESCAPE",    	'rect': pygame.Rect((556, 459), ( 72, 20))})
         self.add_trigger({'action': "leaders",   	'rect': pygame.Rect((556, 427), ( 72, 20))})
         self.add_trigger({'action': "buy",       	'rect': pygame.Rect((590, 123), ( 37, 22))})
-        self.add_trigger({'action': "morale_summary",	'rect': pygame.Rect((309,  31), (202, 25))})
-        self.add_trigger({'action': "bc_summary",	'rect': pygame.Rect((127,  31), (177, 25))})
-        self.add_trigger({'action': "food_summary",	'rect': pygame.Rect((127,  61), (177, 25))})
-        self.add_trigger({'action': "industry_summary",	'rect': pygame.Rect((127,  91), (177, 25))})
-        self.add_trigger({'action': "research_summary",	'rect': pygame.Rect((127, 121), (177, 25))})
+        self.add_trigger({'action': "summary",	'summary': "morale", 'rect': pygame.Rect((309,  31), (202, 25))})
+        self.add_trigger({'action': "summary",	'summary': "bc", 'rect': pygame.Rect((127,  31), (177, 25))})
+        self.add_trigger({'action': "summary",	'summary': "food", 'rect': pygame.Rect((127,  61), (177, 25))})
+        self.add_trigger({'action': "summary",	'summary': "industry", 'rect': pygame.Rect((127,  91), (177, 25))})
+        self.add_trigger({'action': "summary",	'summary': "research", 'rect': pygame.Rect((127, 121), (177, 25))})
 
-    def draw(self, star, planet, colony):
+    def draw(self):
         DISPLAY = gui.GUI.get_display()
         DICTIONARY = dictionary.get_dictionary()
         PLAYERS = networking.Client.list_players()
@@ -35,6 +45,10 @@ class ColonyScreen(screen.Screen):
         font3 = gui.GUI.get_font('font3')
         font5 = gui.GUI.get_font('font5')
 
+        star = self.__star
+        planet = self.__planet
+        colony = self.__colony
+
         DISPLAY.blit(self.get_image('background', 'starfield'), (0, 0))
         DISPLAY.blit(gui.GUI.get_planet_background(planet.get_terrain(), planet.get_picture()), (0, 0))
         DISPLAY.blit(self.get_image('colony_screen', 'panel'), (0, 0))
@@ -42,7 +56,7 @@ class ColonyScreen(screen.Screen):
         colony_id = colony.get_id()
 
         self.reset_triggers_list()
-        self.add_trigger({'action': "change_build", 'colony_id': colony_id, 'rect': pygame.Rect((519, 123), ( 61, 22))})
+        self.add_trigger({'action': "screen", 'screen': "colony_production", 'colony_id': colony_id, 'rect': pygame.Rect((519, 123), ( 61, 22))})
 
         schemes_font_palette = [0x0, 0x141420, 0x6c688c]
 
@@ -70,7 +84,6 @@ class ColonyScreen(screen.Screen):
                     size = object.get_size()
                     x = 10 + [6, 4, 3, 1, 0][size]
                     y = 26 + (24 * i) + [6, 4, 2, 1, 0][size]
-#                    DISPLAY.blit(self.get_ui().get_planet_scheme(terrain, size), (x, y))
                     DISPLAY.blit(self.get_image('planet_scheme', terrain, size), (x, y))
 
             DISPLAY.blit(self.get_image('colony_screen', 'scheme_arrow'), (6,  31 + (24 * i)))
@@ -98,25 +111,25 @@ class ColonyScreen(screen.Screen):
         DISPLAY.blit(self.get_image('government', 'icon', player_government_id), (310, 32))
 
         # TODO: implement negative morale
-        self.repeat_draw(DISPLAY, 340, 35, self.get_image('morale_icon', 'good'), colony.morale() // 10, 30, 7, 155)
+        gui.GUI.repeat_draw(DISPLAY, 340, 35, self.get_image('morale_icon', 'good'), colony.morale() // 10, 30, 7, 155)
 
-        x = 10 + self.repeat_draw(DISPLAY, 128, 64, self.get_image('production_10food'), colony.get_food() // 10, 20, 6, 98)
-        self.repeat_draw(DISPLAY, x, 64, self.get_image('production_1food'), colony.get_food() % 10, 20, 6, 98)
+        x = 10 + gui.GUI.repeat_draw(DISPLAY, 128, 64, self.get_image('production_10food'), colony.get_food() // 10, 20, 6, 98)
+        gui.GUI.repeat_draw(DISPLAY, x, 64, self.get_image('production_1food'), colony.get_food() % 10, 20, 6, 98)
 
         # industry icons
         number = (colony.get_industry() // 10) + (colony.get_industry() % 10)
         xx = min(int(round(160 / max(1, number))), 20)
         print "### colony_screen::draw ... industry icons ... number = %i, xx = %i" % (number, xx)
-        x =  self.repeat_draw(DISPLAY, 128, 94, self.get_image('production_10industry'), colony.get_industry() // 10, xx, 99, 162)
-        self.repeat_draw(DISPLAY, x, 94, self.get_image('production_1industry'), colony.get_industry() % 10, xx, 99, 162)
+        x =  gui.GUI.repeat_draw(DISPLAY, 128, 94, self.get_image('production_10industry'), colony.get_industry() // 10, xx, 99, 162)
+        gui.GUI.repeat_draw(DISPLAY, x, 94, self.get_image('production_1industry'), colony.get_industry() % 10, xx, 99, 162)
 
         # research icons
 
         number = (colony.get_research() // 10) + (colony.get_research() % 10)
         xx = min(int(round(160 / max(1, number))), 20)
         print "### colony_screen::draw ... research icons ... number = %i, xx = %i" % (number, xx)
-        x =  self.repeat_draw(DISPLAY, 128, 124,self.get_image('production_10research'), colony.get_research() // 10, xx, 99, 162)
-        self.repeat_draw(DISPLAY, x, 124, self.get_image('production_1research'), colony.get_research() % 10, xx, 99, 162)
+        x =  gui.GUI.repeat_draw(DISPLAY, 128, 124,self.get_image('production_10research'), colony.get_research() // 10, xx, 99, 162)
+        gui.GUI.repeat_draw(DISPLAY, x, 124, self.get_image('production_1research'), colony.get_research() % 10, xx, 99, 162)
 
         for t in (FARMER, WORKER, SCIENTIST):
             c = len(colony.colonists[t])
@@ -164,18 +177,9 @@ class ColonyScreen(screen.Screen):
 
         DISPLAY.blit(population, (529, 3))
 
-        pygame.display.flip()
+    def process_trigger(self, trigger):
 
-    # end func draw
-
-        self.flip()
-
-    def run(self, colony_id):
-
-        print
-        print "@@@ colony_screen @@@"
-
-        colony = networking.Client.get_colony(colony_id)
+        colony = networking.Client.get_colony(self.__colony_id)
 
         planet_id = colony.get_planet_id()
         planet = networking.Client.get_planet(planet_id)
@@ -183,50 +187,36 @@ class ColonyScreen(screen.Screen):
         star_id	= planet.get_star()
         star = networking.Client.get_star(star_id)
 
-        for build_item in colony.get_build_queue():
-            print "colony_screen::run() ... colony.build_queue[] = %s" % build_item
+        action = trigger['action']
+        print("@ colony_screen::process_trigger()")
 
-        self.draw(star, planet, colony)
+        if trigger['action'] == "summary":
+            summary = trigger['summary']
 
-        while True:
-            event = self.get_event()
-            if event:
-                action = event['action']
-                if action == "ESCAPE":
-                    return
-           
-                elif action == "morale_summary":
-                    summary = colony.print_morale_summary();
-                    self.draw_textbox(summary, 135, 190, 'Morale Summary')
-                    self.draw(star, planet, colony)
+            if summary == "morale":
+                text_box.Screen.set_title("Morale Summary")
+                text_box.Screen.set_content(colony.print_morale_summary())
 
-            
-                elif action == "bc_summary":
-                    summary = colony.print_bc_summary();
-                    self.draw_textbox( summary, 135, 190, 'BC Summary')
-                    self.draw(star, planet, colony)
+            elif summary == "bc":
+                text_box.Screen.set_title("BC Summary")
+                text_box.Screen.set_content(colony.print_bc_summary())
 
-                elif action == "food_summary":
-                    summary = colony.print_food_summary();
-                    self.draw_textbox(summary, 135, 190, 'Food Summary')
-                    self.draw(star, planet, colony)
+            elif summary == "food":
+                text_box.Screen.set_title("Food Summary")
+                text_box.Screen.set_content(colony.print_food_summary())
 
-                elif action == "industry_summary":
-                    summary = colony.print_industry_summary();
-                    self.draw_textbox(summary, 135, 190, 'Industry Summary')
-                    self.draw(star, planet, colony)
+            elif summary == "industry":
+                text_box.Screen.set_title("Industry Summary")
+                text_box.Screen.set_content(colony.print_industry_summary())
 
-                elif action == "research_summary":
-                    summary = colony.print_research_summary();
-                    self.draw_textbox(summary, 135, 190, 'Research Summary')
-                    self.draw(star, planet, colony)
+            elif summary == "research":
+                text_box.Screen.set_title("Research Summary")
+                text_box.Screen.set_content(colony.print_research_summary())
 
-                elif action == "change_build":
-                    colony_build_screen.Screen.run(event['colony_id'])
-                    self.draw(star, planet, colony)
+            gui.GUI.run_screen(text_box.Screen)
+            self.redraw_flip()
 
-                else:
-                    print "UNKNOWN ACTION: " + action
+        print("/ colony_screen::process_trigger()")
 
 
 

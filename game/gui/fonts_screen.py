@@ -33,17 +33,3 @@ class FontsScreen(screen.Screen):
 
         DISPLAY.blit(title, (500, 40))
 
-        self.flip()
-
-
-
-
-    def run(self):
-        self.draw()
-
-        while True:
-            event = self.get_event()
-            action = event['action']
-
-            if action == "QUIT":
-                break

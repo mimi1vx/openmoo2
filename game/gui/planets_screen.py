@@ -6,7 +6,14 @@ import gui
 
 class PlanetsScreen(screen.Screen):
 
-    def get_planets_to_display(self, player_id):
+    def __init__(self):
+        screen.Screen.__init__(self)
+        self.__viewport_size = 8
+        self.planets_to_display = 0
+
+        self.__planet_list_pos = 0
+
+    def list_planets_to_display(self, player_id):
         planets = []
             
         for star_id, star in networking.Client.list_stars().items():
@@ -19,130 +26,86 @@ class PlanetsScreen(screen.Screen):
         return planets
 
     def scroll_up(self, step = 1):
-        self.viewport_top_planet -=step
-        if self.viewport_top_planet < 0:
-                self.viewport_top_planet = 0
-        self.draw()
+        old_start = self.__planet_list_pos
+        self.__planet_list_pos = max(0, self.__planet_list_pos - step)
+        return old_start != self.__planet_list_pos
 
     def scroll_down(self, step = 1):
-        self.viewport_top_planet += step
-        if self.viewport_top_planet not in range(self.planets_to_display - self.viewport_size):
-            self.viewport_top_planet = self.planets_to_display - self.viewport_size
-        self.draw()
-
-    def __init__(self):
-        screen.Screen.__init__(self)
-        self.viewport_size = 8
-        self.viewport_top_planet = 0
-        self.planets_to_display = 0
+        old_start = self.__planet_list_pos
+        self.__planet_list_pos = min(self.__planet_list_pos + step, len(self.__planets_list) - self.__viewport_size)
+        return old_start != self.__planet_list_pos
 
     def reset_triggers_list(self):
         screen.Screen.reset_triggers_list(self)
 
-        #sort priority triggers
-        self.add_trigger({'action': "PRIORITY_CLIMATE", 'rect': pygame.Rect((440, 200), ( 60, 25))})
-        self.add_trigger({'action': "PRIORITY_CLIMATE", 'rect': pygame.Rect((500, 200), ( 70, 25))})
-        self.add_trigger({'action': "PRIORITY_CLIMATE", 'rect': pygame.Rect((570, 200), ( 60, 25))})
+        self.add_trigger({'action': "sort", 'sort': "climate", 'rect': pygame.Rect((442, 200), (58, 25))})
+        self.add_trigger({'action': "sort", 'sort': "minerals", 'rect': pygame.Rect((502, 200), (64, 25))})
+        self.add_trigger({'action': "sort", 'sort': "size", 'rect': pygame.Rect((568, 200), (56, 25))})
 
-        #list filtering triggers
-        trigger_y_size = 23
-        trigger_x_size = 185
-        self.add_trigger({'action': "FILTER_NO_ENEMY_PRESENCE", 'rect': pygame.Rect((440, 265), ( trigger_x_size, trigger_y_size))})
-        self.add_trigger({'action': "FILTER_NORMAL_GRAVITY", 'rect': pygame.Rect((440, 265+1*trigger_y_size), ( trigger_x_size, trigger_y_size))})
-        self.add_trigger({'action': "FILTER_NON_HOSTILE_ENVIROMENT", 'rect': pygame.Rect((440, 265+2*trigger_y_size), ( trigger_x_size, trigger_y_size))})
-        self.add_trigger({'action': "FILTER_MINERAL_ABUNDANCE", 'rect': pygame.Rect((440, 265+3*trigger_y_size), ( trigger_x_size, trigger_y_size))})
-        self.add_trigger({'action': "FILTER_PLANETS_IN_RANGE", 'rect': pygame.Rect((440, 265+4*trigger_y_size), ( trigger_x_size, trigger_y_size))})
+        self.add_trigger({'action': "filter", 'filter': "no_enemy_presence", 'rect': pygame.Rect((444, 268), (177, 18))})
+        self.add_trigger({'action': "filter", 'filter': "normal_gravity", 'rect': pygame.Rect((444, 291), (177, 18))})
+        self.add_trigger({'action': "filter", 'filter': "non_hostile_environment", 'rect': pygame.Rect((444, 314), (177, 18))})
+        self.add_trigger({'action': "filter", 'filter': "mineral_abundance", 'rect': pygame.Rect((444, 337), (177, 18))})
+        self.add_trigger({'action': "filter", 'filter': "planets_in_range", 'rect': pygame.Rect((444, 360), (177, 18))})
 
         #button triggers
-        self.add_trigger({'action': "ESCAPE", 'rect': pygame.Rect((455, 445), ( 150, 20))})
-        self.add_trigger({'action': "SEND_COLONY_SHIP", 'rect': pygame.Rect((455, 390), ( 150, 20))})
-        self.add_trigger({'action': "SEND_OUTPOST_SHIP", 'rect': pygame.Rect((455, 415), ( 150, 20))})
-        self.add_trigger({'action': "VIEWPORT_UP", 'rect': pygame.Rect((422, 15), ( 10, 20))})
-        self.add_trigger({'action': "VIEWPORT_DOWN", 'rect': pygame.Rect((422, 447), ( 10, 20))})
-        self.add_trigger({'action': "SCROLL_UP", 'rect': pygame.Rect((422, 35), ( 12, 205))})
-        self.add_trigger({'action': "SCROLL_DOWN", 'rect': pygame.Rect((422, 240), ( 12, 205))})
+        self.add_trigger({'action': "send_colony_ship", 'rect': pygame.Rect((457, 390), (150, 18))})
+        self.add_trigger({'action': "send_outpost_ship", 'rect': pygame.Rect((457, 416), (150, 18))})
+        self.add_trigger({'action': "ESCAPE", 'rect': pygame.Rect((457, 444), (150, 18))})
 
-        return
-    def draw_planet_globe(self,planet,DISPLAY,screen_obj,x,y):
-        planet_image = screen_obj.get_image('starsystem_map', 'planet', planet.get_terrain(), planet.get_size())
-        w, h = planet_image.get_size()
-        w -= (10 - planet.get_size())
-        h -= (10 - planet.get_size())
-        planet_rect = pygame.Rect((x, y), (w, h))
-        DISPLAY.blit(planet_image, (x-w/2, y-h/2))
-        return planet_rect
-
+        self.add_trigger({'action': "SCROLL_UP", 'rect': pygame.Rect((422, 15), (10, 20))})
+        self.add_trigger({'action': "SCROLL_DOWN", 'rect': pygame.Rect((422, 447), (10, 20))})
+        self.add_trigger({'action': "SCROLL_UP", 'rect': pygame.Rect((422, 35), (12, 205))})
+        self.add_trigger({'action': "SCROLL_DOWN", 'rect': pygame.Rect((422, 240), (12, 205))})
 
     def draw(self):
-
         ME = networking.Client.get_me()
 
-        DISPLAY = gui.GUI.get_display()
         viewport_font_palette = [0x0, 0x181c40, 0x688cb0]
         font3 = gui.GUI.get_font('font3')
 
-        DISPLAY.blit(self.get_image('planets_screen', 'panel'), (0, 0))
+        gui.GUI.draw_image_by_key('planets_screen.panel', (0, 0))
    
-        planets = self.get_planets_to_display(ME.get_id())
-        #TODO: sorting planets 
-        self.planets_to_display = len(planets)
-        ftd = self.viewport_top_planet
-        #x positions, centered, for texts and imgs in viewport
-        x_poss = [60,140,215,310,385]
-        y_poss = 60  # + i*55 -estimate, centers of display windows
-        if (ftd + self.viewport_size) > len(planets):
-            ftd = len(planets)- self.viewport_size
-
-        for i in range(self.viewport_size):
-            ptd = planets[ftd+i]
-            txts = []
-
-            star_id= ptd.get_star()
+        self.__planets_list = self.list_planets_to_display(ME.get_id())
+        #TODO: sorting planets
+        
+        y = 37
+        for planet in self.__planets_list[self.__planet_list_pos:self.__planet_list_pos + self.__viewport_size]:
+            star_id = planet.get_star()
 
             name_t = networking.Client.get_star(star_id).get_name()
-            terrain_t = ptd.terrain_text()
-            minerals_t = ptd.minerals_text()
-            size_t = ptd.size_text()
-            gravity_t = ptd.gravity_text()
+            terrain_t = planet.terrain_text()
+            minerals_t = planet.minerals_text()
+            size_t = planet.size_text()
+            gravity_t = planet.gravity_text()
 
-            planet_y_offset = -4
-            #estimate, from MOO2 screenshots. Planets are not drawn centered
-            
-            self.draw_planet_globe(ptd,DISPLAY, self, x_poss[0] , y_poss+55*i + planet_y_offset)
+            planet_image = gui.GUI.get_image('starsystem_map', 'planet', planet.get_terrain(), planet.get_size())
+            name_label = font3.render(name_t, viewport_font_palette, 2)
+            terrain_label = font3.render(terrain_t, viewport_font_palette, 2)
+            gravity_label = font3.render(gravity_t, viewport_font_palette, 2)
+            minerals_label = font3.render(minerals_t, viewport_font_palette, 2)
+            size_label = font3.render(size_t, viewport_font_palette, 2)
 
-            offset_y = -5
-            txts.append([font3.render(name_t, viewport_font_palette, 1),offset_y])
-            txts.append([font3.render(terrain_t, viewport_font_palette, 1),offset_y])
-            txts.append([font3.render(gravity_t, viewport_font_palette, 1),0])
-            txts.append([font3.render(minerals_t, viewport_font_palette, 1),offset_y])
-            txts.append([font3.render(size_t, viewport_font_palette, 1),offset_y])
+            gui.GUI.draw_image(planet_image, (60 - (planet_image.get_width() // 2), y + 28 - (planet_image.get_height() // 2)))
+            gui.GUI.draw_image(name_label, (60 - (name_label.get_width() // 2), y + 28))
+            gui.GUI.draw_image(terrain_label, (140 - (terrain_label.get_width() // 2), y + 11))
+            gui.GUI.draw_image(gravity_label, (217 - (gravity_label.get_width() // 2), y + 17))
+            gui.GUI.draw_image(minerals_label, (311 - (minerals_label.get_width() // 2), y + 11))
+            gui.GUI.draw_image(size_label, (386 - (size_label.get_width() // 2), y + 11))
 
-            #TODO: get industry, population sizes and food prod data
-            j=0
-            for txt in txts:
-                (tw, th) = txt[0].get_size()
-                DISPLAY.blit(txt[0], (x_poss[j]-tw/2,y_poss+55*i+txt[1]-th/2))
-                j+=1
+            #TODO: display industry, population sizes, food prod data, enemy presence...
 
-        self.flip()
+            y += 55
 
-    def run(self):
-        self.draw()
+    def process_trigger(self, trigger):
 
-        while True:
-            event = self.get_event()
-            if event:
-                action = event['action']
-                if action == "ESCAPE":
-                    return
-                if action == "VIEWPORT_UP":
-                    self.scroll_up()
-                if action == "VIEWPORT_DOWN":
-                    self.scroll_down()
-                if action == "SCROLL_UP":
-                    self.scroll_up()
-                if action == "SCROLL_DOWN":
-                    self.scroll_down()
-                   
+        if trigger['action'] == "SCROLL_UP":
+            if self.scroll_up():
+                self.redraw_flip()
+
+        if trigger['action'] == "SCROLL_DOWN":
+            if self.scroll_down():
+                self.redraw_flip()
+
 
 Screen = PlanetsScreen()
