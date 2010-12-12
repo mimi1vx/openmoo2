@@ -250,6 +250,49 @@ class GuiClient(object):
 
 	print "...Done"
 
+    def draw_line(self, (x1, y1), (x2, y2), color_list):
+        """ Draws a line from [x1, y1] to [x2, y2] using the list of colors as pixel bitmap.
+        The colors from list are used around one by one.
+        If there's only one color in the list the line drawing is passed to pygame.draw_lie
+        If the color list is empty, no drawing is performed
+            
+        """
+        cols = len(color_list)
+
+        if cols == 0:
+            """no color, no drawing..."""
+        elif cols == 1:
+            """in case of 1 color line use original pygame function"""
+            return pygame.draw.line(self.__DISPLAY, color_list[0], (x1, y1), (x2, y2), 1)
+        else:
+
+            xx = float(x2 - x1)
+            yy = float(y2 - y1)
+
+            if xx == 0:
+                xxx = 0
+                yyy = 1
+            elif yy == 0:
+                xxx = 1
+                yyy = 0
+            else:
+                xxx = min(abs(xx / yy), 1) * (xx / abs(xx))
+                yyy = min(abs(yy / xx), 1) * (yy / abs(yy))
+
+            pxarray = pygame.PixelArray(self.__DISPLAY)
+
+            x, y = float(x1), float(y1)
+
+            pixel_count = int(max(abs(xx), abs(yy)))
+
+            for i in range(pixel_count):
+                pxarray[int(round(x))][int(round(y))] = color_list[i % cols]
+                x += xxx
+                y += yyy
+        rect = pygame.Rect(x1, y1, x2, y2)
+        rect.normalize()
+        return rect
+
     def draw_image(self, img, pos):
         """Draws an image object on a display buffer"""
         self.__DISPLAY.blit(img, pos)

@@ -1,6 +1,5 @@
 import pygame
 
-import pygame_ext
 import screen
 import networking
 import gui
@@ -193,10 +192,10 @@ class MainScreen(screen.Screen):
 	    self.__tick = tick
             DISPLAY = gui.GUI.get_display()
             for wormhole in self.__map_items['wormholes']:
-                pygame_ext.draw_line(DISPLAY, wormhole['pos1'], wormhole['pos2'], [0x444444])
+                gui.GUI.draw_line(wormhole['pos1'], wormhole['pos2'], [0x444444])
 
             for ship_track in self.__map_items['ship_tracks']:
-                pygame_ext.draw_line(DISPLAY, ship_track['pos1'], ship_track['pos2'], ship_tracks_bitmaps[tick])
+                gui.GUI.draw_line(ship_track['pos1'], ship_track['pos2'], ship_tracks_bitmaps[tick])
 
             for star in self.__map_items['stars']:
 		gui.GUI.draw_image(star['img'], star['pos1'])
