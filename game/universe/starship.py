@@ -33,11 +33,20 @@ class Starship(SpaceObject):
         t = ["orbit", "travel", "launch", "???", "refit", "deleted", "build"]
         return t[self.get_status()]
 
+    def set_orbiting(self):
+        self.set_status(0)
+
     def is_orbiting(self):
         return self.get_status() == 0
 
+    def set_travelling(self):
+        self.set_status(1)
+
     def is_travelling(self):
         return self.get_status() == 1
+
+    def set_launching(self):
+        self.set_status(2)
 
     def is_launching(self):
         return self.get_status() == 2

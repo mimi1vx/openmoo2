@@ -43,7 +43,7 @@ def main(argv):
 #    GAME.show_planets()
     GAME.show_players()
 #    GAME.show_colonies()
-#    GAME.show_ships()
+    GAME.show_ships()
 
     SERVER = networking.GameServer(LISTEN_ADDR, LISTEN_PORT, GAME)
     SERVER.set_name(GAME_FILE.split("/")[-1])

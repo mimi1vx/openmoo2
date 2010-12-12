@@ -1,13 +1,18 @@
-#import os
+import math
 
 import moo2
 import universe
 import rules
 
+
 def stardate(i):
     s = str(i)
     return s[:-1] + "." + s[-1]
 # /stardate
+
+
+PARSEC_LENGTH = 30
+
 
 class Game:
 
@@ -311,6 +316,43 @@ class Game:
         }
     # /get_data_for_player
 
+    def __move_ships(self):
+        """ Count new position af all moving or launching ships
+
+            TODO: new start system exploration
+            TODO: slowdown in nebulae
+            TODO: usage of wormholes, jump gate and star gate
+
+        """
+        print("=== Move ships ===")
+        for ship_id, ship in self.__ships.items():
+            # if ship exists and is launching or already travelling
+            if ship.exists() and ship.get_status() in (1, 2):
+                ship_x, ship_y = ship.get_coords()
+                ship_speed = ship.get_travelling_speed()
+                dest = ship.get_destination()
+                dest_x, dest_y = self.__stars[dest].get_coords()
+
+                xx = dest_x - ship_x
+                yy = dest_y - ship_y
+
+                distance = math.sqrt(xx**2 + yy**2)
+
+                parsecs = float(distance) / float(PARSEC_LENGTH)
+
+                if parsecs > ship_speed:
+                    # move towards ship's destination at known speed
+                    parsec_x = float(xx) / parsecs
+                    parsec_y = float(yy) / parsecs
+                    ship_xx = int(ship_x + math.ceil(float(ship_speed) * parsec_x))
+                    ship_yy = int(ship_y + math.ceil(float(ship_speed) * parsec_y))
+                    ship.set_coords(ship_xx, ship_yy)
+                    ship.set_travelling()
+                else:
+                    # ship has reached its destination
+                    ship.set_coords(dest_x, dest_y)
+                    ship.set_orbiting()
+
     def next_turn(self):
 #        raise research_progress
 #        raise population
@@ -322,6 +364,8 @@ class Game:
         print
 
         self.recount()
+
+        self.__move_ships()
 
         for player_id in self.__players:
             player = self.__players[player_id]
@@ -425,11 +469,15 @@ class Game:
 
     def show_ships(self):
         print
-        print("+---------+-----------------+----------+------------+-----------------+-------+-------+")
-        print("| ship_id | owner           | status   | coords     | destination     | speed | turns |")
-        print("+---------+-----------------+----------+------------+-----------------+-------+-------+")
+        print("+---------+-----------------+----------+------------+----------------------------+-------+-------+")
+        print("| ship_id | owner           | status   | coords     | destination                | speed | turns |")
+        print("+---------+-----------------+----------+------------+----------------------------+-------+-------+")
         for ship_id, ship in self.__ships.items():
             if ship.exists():
-                print("| %7i | %15s | %8s | %4i, %4i | %15s | %5i | %5i |" % (ship_id, self.__players[ship.get_owner()].get_race_name(), ship.get_status_text(), ship.get_x(), ship.get_y(), self.__stars[ship.get_destination()].get_name(), ship.get_travelling_speed(), ship.get_turns_left()))
-        print("+---------+-----------------+----------+------------+-----------------+-------+-------+")
+                dest = ship.get_destination()
+                dest_name = self.__stars[dest].get_name()
+                dest_x, dest_y = self.__stars[dest].get_coords()
+
+                print("| %7i | %15s | %8s | %4i, %4i | [%3i, %3i] %15s | %5i | %5i |" % (ship_id, self.__players[ship.get_owner()].get_race_name(), ship.get_status_text(), ship.get_x(), ship.get_y(), dest_x, dest_y, dest_name, ship.get_travelling_speed(), ship.get_turns_left()))
+        print("+---------+-----------------+----------+------------+----------------------------+-------+-------+")
         print
