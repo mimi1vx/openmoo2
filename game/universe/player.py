@@ -6,6 +6,7 @@ __date__ ="$May 16, 2010 1:31:45 PM$"
 class Player(GameObject):
 
     def __init__(self, player_id):
+        self.__explored_stars = []
         self.set_id(player_id)
 
     def alive(self):
@@ -202,6 +203,13 @@ class Player(GameObject):
 
     def list_research_areas(self):
         return self.__research_areas
+
+    def knows_star_id(self, star_id):
+        return star_id in self.__explored_stars
+
+    def add_explored_star_id(self, star_id):
+        if star_id and not self.knows_star_id(star_id):
+            self.__explored_stars.append(star_id)
 
     def print_debug(self):
         print

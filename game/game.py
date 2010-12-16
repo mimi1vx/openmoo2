@@ -14,7 +14,7 @@ def stardate(i):
 PARSEC_LENGTH = 30
 
 
-class Game:
+class Game(object):
 
     def __init__(self, rules, game_file = None):
         self.set_recount_flag(False)
@@ -63,11 +63,14 @@ class Game:
                 if not self.__players_heroes.has_key(hero['player']):
                     self.__players_heroes[hero['player']] = {}
                 self.__players_heroes[hero['player']][hero['id']] = hero
-
-                
-
 #        print self.__players_heroes
     # /init_heroes
+
+    def init_players(self):
+        for player_id, player in self.__players.items():
+            for star_id, star in self.__stars.items():
+                if star.visited_by_player(player_id):
+                    player.add_explored_star_id(star_id)
 
     def load_moo2_savegame(self, filename):
         """
@@ -94,7 +97,8 @@ class Game:
         self.init_stars()
         self.init_colonies()
         self.init_heroes()
-        
+        self.init_players()
+
         self.recount()
     # /load_moo2_savegame
  
@@ -253,18 +257,17 @@ class Game:
     # /raise_population
 
     def get_stars_for_player(self, player_id):
+        """ Returns a dictionary of all stars in galaxy.
+        Stars that player doesn't know yet are listed as an UnexploredStar class
+
+        """
         stars = {}
-        for star_id in self.__stars:
-#            print("star_id = %i" % star_id)
-#            print(" visited = %i" % star['visited'])
-            st = self.__stars[star_id]
-            if st.visited_by_player(player_id):
-                stars[star_id] = st
+        for star_id, star in self.__stars.items():
+            if self.__players[player_id].knows_star_id(star_id):
+                stars[star_id] = star
             else:
-                # FIXME: this part returns dict instead of object!
-                stars[star_id] = universe.UnexploredStar(star_id, st.get_x(), st.get_y(), st.get_size(), st.get_pict_type(), st.get_class())
+                stars[star_id] = universe.UnexploredStar(star_id, star.get_x(), star.get_y(), star.get_size(), star.get_pict_type(), star.get_class())
         return stars
-    # /get_stars_for_player
 
     def get_colonies_for_player(self, player_id):
         colonies = {}
@@ -352,6 +355,8 @@ class Game:
                     # ship has reached its destination
                     ship.set_coords(dest_x, dest_y)
                     ship.set_orbiting()
+                    if not self.__players[ship.get_owner()].knows_star_id(dest):
+                        self.__players[ship.get_owner()].add_explored_star_id(dest)
 
     def next_turn(self):
 #        raise research_progress
