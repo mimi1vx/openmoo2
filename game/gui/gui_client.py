@@ -435,6 +435,7 @@ class GuiClient(object):
         scr.reset_triggers_list()
         scr.prepare()
         scr.draw()
+        self.highlight_triggers(scr.list_triggers())
 	
         trigger = None
 

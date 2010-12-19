@@ -228,27 +228,8 @@ class MainScreen(screen.Screen):
         else:
             self.__zoom_level = 0
 
-    def on_key_down(self, scancode, key):
-        if key == 99:
-            gui.GUI.run_screen(colonies_screen.Screen)
-            return True
-        if key == 112:
-            gui.GUI.run_screen(planets_screen.Screen)
-            return True
-        if key == 108:
-            gui.GUI.run_screen(leaders_screen.Screen)
-            return True
-        if key == 105:
-            gui.GUI.run_screen(info_screen.Screen)
-            return True
-        return False
-
-
     def process_trigger(self, trigger):
         pass
-        if trigger['action'] == "colonies_screen":
-            gui.GUI.run_screen(colonies_screen.Screen)
-            return "screen"
 
 
 Screen = MainScreen()

@@ -149,7 +149,7 @@ class Screen(object):
         There is a good chance that no screen would have to override this method.
 
         """
-        print("@ screen.Screen::on_key_down()")
+        print("@ screen.Screen::on_keydown()")
         print("    scancode = %i" % event.scancode)
         print("    key = %i" % event.key)
         if event.key == K_ESCAPE:
