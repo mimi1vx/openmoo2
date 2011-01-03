@@ -17,6 +17,7 @@ import leaders_screen
 import info_screen
 import research_screen
 import starsystem_screen
+import fleet_screen
 
 redraw_mouse_event = pygame.USEREVENT + 1
 animate_screen_event = pygame.USEREVENT + 2
@@ -34,7 +35,7 @@ class GuiClient(object):
 
     def __init__(self):
         self.__graphic_ini = self.__read_text_file("../graphic.ini")
-#        self.highlight_triggers_on()
+        self.highlight_triggers_on()
 
     def init(self, moo2_dir):
         self.__moo2_dir = moo2_dir
@@ -44,8 +45,9 @@ class GuiClient(object):
         self.__load_fonts()
         self.__load_palettes()
         self.__load_graphic(self.__graphic_ini[:1])
+        self.__load_ships_lbx()
         self.__DISPLAY = pygame.display.get_surface()
-
+        
     def get_display(self):
         """Returns Pygame Displa Surface object
 	
@@ -170,7 +172,8 @@ class GuiClient(object):
             'OFFICER': copy.deepcopy(self.__raw_palettes['FONTS_02']),
             'PLANETS': copy.deepcopy(self.__raw_palettes['FONTS_02']),
             'RACEICON': copy.deepcopy(self.__raw_palettes['FONTS_02']),
-            'SR_R9_SC': copy.deepcopy(self.__raw_palettes['FONTS_02'])
+            'SR_R9_SC': copy.deepcopy(self.__raw_palettes['FONTS_02']),
+            'SHIPS': copy.deepcopy(self.__raw_palettes['IFONTS_3'])
         }
 
     def __get_img_key(self, img_key, subkey1 = None, subkey2 = None, subkey3 = None):
@@ -221,8 +224,8 @@ class GuiClient(object):
 	print "Loading graphic..."
 	for line in graphic_ini:
 
-	    if line and line[0] != "#":
-                print line
+#	    if line and line[0] != "#":
+#                print line
 		line = line.split("=", 1)
 		img_keys = line[0].strip().split(".", 3)
 #		print img_keys
@@ -249,6 +252,32 @@ class GuiClient(object):
 			self.load_lbx_solid_image(source_file, source_index, lbx_palette, img_key, subkey1, subkey2, subkey3)
 
 	print "...Done"
+
+
+
+    def __load_ships_lbx(self, color='all', file='ships_lbx.ini'):
+        """Loads ships to image pool
+        Either loads all ships of all colors (color=all" or only of one color.
+        All ships are in ship.lbx in blocks, every color in it's own block of 50 images.
+        There are  8 blocks for each color and one (400-449) that has monsters and Antarans.
+        This is in a separate method because there are ~400 images in the lbx to load, too many to put into lbx.md5 file
+        """
+        block_length = 50 # from the ships.lbx file.
+        colors=['red','yellow','green','white','blue','brown','purple','orange']
+
+        if color == 'all':
+            for j in xrange(len(colors)):
+                self.__load_ships_lbx(colors[j])
+
+        if color in colors:
+            i = colors.index(color)
+            offset = block_length*i
+            for ii in range(50):
+                idx = offset + ii 
+                #self.load_lbx_transparent_image('SHIPS.LBX', idx, str(ii%17+1), 0x00, 'SHIP', i, ii)
+                self.load_lbx_transparent_image('SHIPS.LBX', idx, 'SHIPS', 0x00, 'SHIP', i, ii)
+            return
+        print('->loading ships...finished')
 
     def draw_line(self, (x1, y1), (x2, y2), color_list):
         """ Draws a line from [x1, y1] to [x2, y2] using the list of colors as pixel bitmap.
@@ -392,6 +421,8 @@ class GuiClient(object):
         elif trigger['screen'] == "colony_production":
             next_screen = colony_production_screen.Screen
             next_screen.open_colony(trigger['colony_id'])
+        elif trigger['screen'] == "fleets":
+            next_screen = fleet_screen.Screen
 
         # prepare and run the next_screen
         if next_screen:

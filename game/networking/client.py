@@ -98,6 +98,7 @@ class GameClient(object):
     def list_ships(self,player_id=-1):
         """returns ships of one player as a list of starship objects
         """
+        ships=[]
         for ship_id in self.__game_data['ships']:
             ship = self.__game_data['ships'][ship_id]
             player = self.__game_data['players'][ship.get_owner()]

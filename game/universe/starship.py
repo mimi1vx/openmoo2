@@ -7,6 +7,8 @@ class Starship(SpaceObject):
 
     def __init__(self, ship_id):
         self.set_id(ship_id)
+        self.__key1 = None #image key is uninitialized
+        self.__key2 = None #image key is uninitialized
 
     def set_design(self, design):
         self.__design = design
@@ -157,3 +159,25 @@ class Starship(SpaceObject):
 #            print("star # %i ... %s" % (star_id, stars[star_id].get_name()))
 #        print("/ship")
         print
+    def has_no_image(self):
+        if self.__key1 is None and self.__key2 is None:
+            return True
+        return False
+
+    def set_image_keys(self,subkey1,subkey2):
+        self.__key1=subkey1; #color 0..7
+        self.__key2=subkey2; #index  0..49
+
+    def get_image_keys(self):
+        return [self.__key1,self.__key2];
+
+    def determine_image_keys(self,color):
+        """finds out the keys for the ship image from the loaded data.
+        This is necessary because during savegame loading,
+        there is no information on player's color,
+        so the correct image can't be assigned"""
+        pict = self.get_design()['picture']
+        self.set_image_keys(color, pict)
+
+
+        
