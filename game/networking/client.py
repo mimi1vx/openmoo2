@@ -91,8 +91,22 @@ class GameClient(object):
     def get_colony(self, colony_id):
         return self.__game_data['colonies'][colony_id]
 
-    def list_ships(self):
+    def list_ship_ids(self):
+        """returns all ships as a list of ship_id's (old method)"""
         return self.__game_data['ships']
+
+    def list_ships(self,player_id=-1):
+        """returns ships of one player as a list of starship objects
+        """
+        for ship_id in self.__game_data['ships']:
+            ship = self.__game_data['ships'][ship_id]
+            player = self.__game_data['players'][ship.get_owner()]
+            if ship.has_no_image() and hasattr(player, '__color'):
+                col = player.get_color()
+                ship.determine_image_keys(col)
+            if ship.get_owner() == player_id and ship.exists():
+                ships.append(ship)
+        return ships
 
     def list_prototypes(self):
         return self.__game_data['prototypes']

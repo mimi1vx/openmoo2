@@ -36,6 +36,7 @@ class MainScreen(screen.Screen):
         self.add_trigger({'action': "screen", 'screen': "research",	'rect': pygame.Rect((547, 347), (64, 66))})
         self.add_trigger({'action': "newTurn",		'rect': pygame.Rect((547, 444), (59, 19))})
         self.add_trigger({'action': "screen", 'screen': "planets",    'rect': pygame.Rect((93, 431), (65, 38)), 'key': 112}) # P key
+        self.add_trigger({'action': "screen", 'screen': "fleets",    'rect': pygame.Rect((160, 431), (65, 38)), 'key': 102}) # F key
 
     def get_pos(self, (x, y)):
         pos_x = self.__map_x + ((x * self.__map_width) / self.__galaxy_width)
@@ -106,7 +107,7 @@ class MainScreen(screen.Screen):
 
         PLAYERS = networking.Client.list_players()
         STARS    = networking.Client.list_stars()
-        SHIPS = networking.Client.list_ships()
+        SHIPS = networking.Client.list_ship_ids()
         STARS_BY_COORDS = networking.Client.list_stars_by_coords()
 
         for ship_id in SHIPS:
@@ -167,8 +168,8 @@ class MainScreen(screen.Screen):
         font4 = gui.GUI.get_font('font4')
 
         self.reset_triggers_list()
-	gui.GUI.draw_image_by_key('background.starfield', (0, 0))
-	gui.GUI.draw_image_by_key('main_screen.panel', (0, 0))
+        gui.GUI.draw_image_by_key('background.starfield', (0, 0))
+        gui.GUI.draw_image_by_key('main_screen.panel', (0, 0))
 
         # main screen draws a lot of objects in "layers" so map images are prepared first and draw in groups after that
         self.clear_map_items()
@@ -198,10 +199,10 @@ class MainScreen(screen.Screen):
                 gui.GUI.draw_line(ship_track['pos1'], ship_track['pos2'], ship_tracks_bitmaps[tick])
 
             for star in self.__map_items['stars']:
-		gui.GUI.draw_image(star['img'], star['pos1'])
+            	gui.GUI.draw_image(star['img'], star['pos1'])
 
             for ship in self.__map_items['ships']:
-		gui.GUI.draw_image(ship['img'], ship['pos1'])
+                gui.GUI.draw_image(ship['img'], ship['pos1'])
 
             return True
 

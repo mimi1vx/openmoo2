@@ -30,7 +30,7 @@ class ColoniesScreen(screen.Screen):
         DISPLAY = gui.GUI.get_display()
 
 #        DISPLAY.blit(self.get_image('colonies_screen', 'panel'), (0, 0))
-	gui.GUI.draw_image_by_key('colonies_screen.panel', (0, 0))
+    	gui.GUI.draw_image_by_key('colonies_screen.panel', (0, 0))
 
         font2 = gui.GUI.get_font('font2')
         font3 = gui.GUI.get_font('font3')
@@ -113,7 +113,7 @@ class ColoniesScreen(screen.Screen):
         print("@ colonies_screen.scroll_down()")
         old_start = self.__list_start
         self.__list_start = min(self.__list_start + step, self.__list_size - self.__view_size + 1)
-	print("    self.__list_start = %i" % self.__list_start)
+        print("    self.__list_start = %i" % self.__list_start)
         if old_start != self.__list_start:
 	    self.redraw_flip()
         print("/ colonies_screen.scroll_down()")
