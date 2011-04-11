@@ -99,7 +99,7 @@ class GuiClient(object):
         lbx_md5 = self.__read_text_file("../lbx.md5")
         check = True
         for line in lbx_md5:
-            md5, filename = line.split("  ")
+            md5, filename = line.strip().split("  ")
             self.__lbx[filename] = lbx.Archive("%s/%s" % (self.__moo2_dir, filename), md5)
             if self.__lbx[filename].check_md5():
                 print("    %s  %s ... OK" % (md5, filename))
