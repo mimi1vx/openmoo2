@@ -313,13 +313,13 @@ class Colony(GameObject):
         return self.__owner
 
     def is_owned_by(self, player_id):
-        return self.get_owner() == player_id
+        return self.exists() and self.get_owner() == player_id
 
     def is_outpost(self):
-        return self.__is_outpost
+        return self.exists() and self.__is_outpost
         
     def is_colony(self):
-        return not self.is_outpost()
+        return self.exists() and not self.is_outpost()
 
     def max_population(self):
         return self.__max_population
