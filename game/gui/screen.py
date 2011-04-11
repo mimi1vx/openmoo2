@@ -236,3 +236,23 @@ class Screen(object):
 
         """
         pass
+
+    def enter(self):
+        """ Called by GUI engine right before gui_client::run_screen() is invoked
+        Suitable for saving initial state that can be reveresed by the screen's cancel() method
+
+        """
+        pass
+
+    def leave_confirm(self):
+        """ Called by GUI engine when CONFIRM trigger is activated
+        Every screen that sends data to the game server should implement this method
+
+        """
+        pass
+
+    def leave_cancel(self):
+        """ Called by GUI engine when ESCAPE trigger is activated
+            This is the right place to implement things like getting the screen to state before any changes were made
+        """
+        pass

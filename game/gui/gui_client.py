@@ -426,6 +426,7 @@ class GuiClient(object):
 
         # prepare and run the next_screen
         if next_screen:
+            next_screen.enter()
 	    self.run_screen(next_screen)
 
     	    # when back from new_screen, redraws the old screen and continue
@@ -529,14 +530,26 @@ class GuiClient(object):
                     # processed later - can be chained...
                     pass
 
+                elif trigger['action'] == "CONFIRM":
+                    # processed later - can be chained...
+                    pass
+
                 else:
                     print("    trigger = %s" % trigger)
                     # some screens may return a new trigger, e.g. ESCAPE
                     trigger = scr.process_trigger(trigger)
 
                 if trigger:
-                    if trigger['action'] == "ESCAPE":
+                    if trigger['action'] == "CONFIRM":
+                        """ Let the screen confirm the changes """
                         print("/ Gui::run_screen()")
+                        scr.leave_confirm()
+                        return
+
+                    if trigger['action'] == "ESCAPE":
+                        """ Let the screen perform cleanup from changes """
+                        print("/ Gui::run_screen()")
+                        scr.leave_cancel()
                         return
 
                 trigger = None
