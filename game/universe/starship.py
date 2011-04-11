@@ -16,6 +16,18 @@ class Starship(SpaceObject):
     def get_design(self):
         return self.__design
 
+    def get_picture(self):
+        return self.__design['picture']
+
+    def get_shield(self):
+        return self.__design['shield']
+
+    def get_computer(self):
+        return self.__design['computer']
+
+    def get_size(self):
+        return self.__design['size']
+
     def set_owner(self, player_id):
         self.__owner = player_id
 
