@@ -5,6 +5,8 @@ import networking
 import game
 import rules
 
+from openmoo2 import find_moo2_dir
+
 def show_usage(name, message):
     print
     print(message)
@@ -36,23 +38,28 @@ def main(argv):
 
     print("* Init...")
     GAME = game.Game(rules.DEFAULT_RULES)
-    print("* Loading savegame from '%s'" % GAME_FILE)
-    GAME.load_moo2_savegame(GAME_FILE)
 
-#    GAME.show_stars()
-#    GAME.show_planets()
-    GAME.show_players()
-#    GAME.show_colonies()
-    GAME.show_ships()
+    moo2_dir = find_moo2_dir()
+    if moo2_dir is not None:
+        print("* Loading savegame from '%s/%s'" % (moo2_dir, GAME_FILE))
+        GAME.load_moo2_savegame(moo2_dir + "/" + GAME_FILE)
+#        GAME.show_stars()
+#        GAME.show_planets()
+        GAME.show_players()
+#        GAME.show_colonies()
+        GAME.show_ships()
 
-    SERVER = networking.GameServer(LISTEN_ADDR, LISTEN_PORT, GAME)
-    SERVER.set_name(GAME_FILE.split("/")[-1])
+        SERVER = networking.GameServer(LISTEN_ADDR, LISTEN_PORT, GAME)
+        SERVER.set_name(GAME_FILE.split("/")[-1])
 
-    print("* Run...")
-    SERVER.run()
+        print("* Run...")
+        SERVER.run()
 
-    print("* Exit...")
-    sys.exit(0)
+        print("* Exit...")
+        sys.exit(0)
+    else:
+        print "Error: MOO2 Game directory not found in ../, ../../ or ../../../"
+        sys.exit(1)
 
 if __name__ == "__main__":
     main(sys.argv)
