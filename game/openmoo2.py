@@ -25,7 +25,7 @@ def show_usage(name, message):
 
 def find_moo2_dir():
     guess_dirs = ["moo2", "MOO2", "MoO2", "Moo2", "orion2", "ORION2", "Orion2", "mooii", "MOOII"]
-    for parent in range(3):
+    for parent in range(4):
         p = "../" * parent
         for d in guess_dirs:
             if os.path.isdir(p + d):
