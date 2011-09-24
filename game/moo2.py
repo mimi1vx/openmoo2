@@ -8,6 +8,19 @@ def compose_int(b0, b1, b2 = 0, b3 = 0):
     return b0 + (b1 << 8) + (b2 << 16) + (b3 << 24)
 # end func get_int
 
+def bitarray(bytes_array):
+    """
+        returns a list of booleans from bit-values of given bytearray
+    """
+    ba = []
+    index = 1
+    for byte in bytes_array:
+        for bit in range(7):
+            if byte & 1 << bit:
+                ba.append(index)
+            index += 1
+    return ba
+
 class Moo2Savegame(object):
     """
     
@@ -624,13 +637,14 @@ class Moo2Savegame(object):
         return {
                 'name':                 lbx.read_string(self.__data, offset, 16),
                 'size':         	lbx.read_byte(self.__data, offset + 0x10),
-                'type':                 lbx.read_byte(self.__data, offset + 0x11),
+                'type':                 lbx.read_byte(self.__data, offset + 0x11),      # 0 = combat ship, 1 = colony ship, 2 = transport ship, 3 = guardian, 4 = outpost ship
                 'shield':		lbx.read_byte(self.__data, offset + 0x12),
                 'drive':		lbx.read_byte(self.__data, offset + 0x13),
                 'speed':		lbx.read_byte(self.__data, offset + 0x14),
                 'computer':		lbx.read_byte(self.__data, offset + 0x15),
                 'armor':		lbx.read_byte(self.__data, offset + 0x16),
-                'special_devices':	self.__data[offset + 0x17:offset + 0x1C],	# char  special_device_flags[(MAX_SPECIALS+7)/8];
+#                'special_devices':	self.__data[offset + 0x17:offset + 0x1C],	# char  special_device_flags[(MAX_SPECIALS+7)/8];
+                'special_devices':	bitarray(bytearray(self.__data[offset + 0x17:offset + 0x1C])),	# char  special_device_flags[(MAX_SPECIALS+7)/8];
                 'weapons':		weapons,
                 'picture':		lbx.read_byte(self.__data, offset + 0x5C),
                 'builder':		lbx.read_byte(self.__data, offset + 0x5D),		# or previous owner?
@@ -648,7 +662,9 @@ class Moo2Savegame(object):
 
         ship = universe.Starship(ship_id)
 
-        ship.set_design(self.parse_ship_design(offset))
+        ship_design = self.parse_ship_design(offset)
+        ship.set_name(ship_design['name'])
+        ship.set_design(ship_design)
         ship.set_owner(lbx.read_byte(data, 0x63))
         ship.set_status(lbx.read_byte(data, 0x64))                               # 0 = orbitting, 2 = traveling, 5 = destroyed?
         ship.set_destination(lbx.read_short_int(data, 0x65) % 500)                             # destination star
@@ -673,15 +689,10 @@ class Moo2Savegame(object):
 
     def parse_ships(self):
         SAVE_SHIP_COUNT_OFFSET    = 0x21f56
-        SAVE_SHIPS_OFFSET         = 0x21f58
-        SAVE_SHIP_RECORD_SIZE     = 0x81        # = 129
-    #    SAVE_SHIP_WEAPONS_OFFSET  = 0x1c
-    #    SAVE_SHIP_SPECIALS_OFFSET = 0x17
 
         c = compose_int(ord(self.__data[SAVE_SHIP_COUNT_OFFSET]), ord(self.__data[SAVE_SHIP_COUNT_OFFSET + 1]))
         ships = {}
         for ship_id in range(c):
-#            print "ship @ %x" % offset
             ships[ship_id] = self.parse_one_ship(ship_id)
         return ships
     # end func parse_ships

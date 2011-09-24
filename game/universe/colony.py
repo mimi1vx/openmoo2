@@ -151,6 +151,10 @@ class Colony(GameObject):
     def has_building(self, b_id):
         return b_id in self.__buildings
 
+    def add_building(self, building_id):
+        if not self.has_building(building_id):
+            self.__buildings.append(building_id)
+
     def assign_planet(self, planet):
         self.__planet = planet
 
@@ -396,6 +400,12 @@ class Colony(GameObject):
         else:
             return None
 
+    def in_build_queue(self, production_id):
+        """
+            Returns True if given productiion_id is already in queue
+        """
+        return production_id in self.get_build_queue_ids()
+
     """
         get_agregated_populations
     """
@@ -606,6 +616,22 @@ class Colony(GameObject):
 #	    print("")
             self.init_available_production(game_rules, players)
     # end func recount
+
+    def debug_production(self, rules):
+        print("    @ colony::debug_production()... colony_id = %i" % self.get_id())
+        for build_item in self.get_build_queue():
+            production_id = build_item['production_id']
+            if rules['buildings'][production_id].has_key('type'):
+                type = rules['buildings'][production_id]['type']
+            else:
+                type = "building"
+            print("        production_id: %3i ... flags: %3i ... type: %10s ... %s" % (production_id, build_item['flags'], type, rules['buildings'][production_id]['name']))
+        print("")
+#            print("        production_id: %i" % production_id)
+##            print("            flags: %i" % build_item['flags'])
+#            print("            name: %s" % rules['buildings'][production_id]['name'])
+#            print("            type: %s" % type)
+
 
 class EnemyColony(Colony):
 

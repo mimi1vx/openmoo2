@@ -161,6 +161,12 @@ class GameClient(object):
         else:
             print("PING: WRONG RESPONSE '%s' returned in %ss" % (ping_response, ping_time))
 
+
+    def set_colony_build_queue(self, colony_id, build_queue):
+        """ Sends the new build queue for given player's colony """
+        self.send("SET_BUILD_QUEUE", {'colony_id': colony_id, 'build_queue': build_queue})
+        return self.fetch_game_data()
+        
 """
     def get_game_data(self):
         self.send("GET_GAME")

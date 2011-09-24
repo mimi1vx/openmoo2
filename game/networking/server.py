@@ -205,6 +205,13 @@ class GameServer(object):
                     research_item = PARAMS['tech_id']
                     if not self.__game.update_research(PLAYER_ID, research_item):
                         self.log_error("Game::set_research() failed ... PLAYER_ID = %i, research_item = %i" % (PLAYER_ID, research_item))
+
+                elif ACTION == "SET_BUILD_QUEUE":
+                    if not self.__game.set_colony_build_queue(PLAYER_ID, PARAMS['colony_id'], PARAMS['build_queue']):
+                        self.log_error("Game::set_colony_build_queue() failed ... PLAYER_ID = %i, colony_id = %i" % (PLAYER_ID, PARAMS['colony_id']))
+
+
+
                 else:
                     self.log_error("unknow action received from client: '%s'" % data)
 

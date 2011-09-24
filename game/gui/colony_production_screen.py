@@ -1,3 +1,5 @@
+import copy
+
 import pygame
 
 from _game_constants import *
@@ -26,7 +28,8 @@ class ColonyProductionScreen(screen.Screen):
 
     def reset_triggers_list(self):
         screen.Screen.reset_triggers_list(self)
-        self.add_trigger({'action': "ESCAPE", 'hover_id': "ESCAPE", 'rect': pygame.Rect((496, 448), (56, 16))})
+        self.add_trigger({'action': "ESCAPE", 'hover_id': "ESCAPE", 'rect': pygame.Rect((494, 448), (58, 16))})
+        self.add_trigger({'action': "CONFIRM", 'hover_id': "CONFIRM", 'rect': pygame.Rect((563, 448), (58, 16))})
 
     def draw(self):
         DISPLAY = gui.GUI.get_display()
@@ -49,6 +52,9 @@ class ColonyProductionScreen(screen.Screen):
         light_text_palette = [0x0, 0x802810, 0xe48820, 0xe46824]
         dark_text_palette = [0x0, 0x440c00, 0xac542c]
 
+        build_queue = colony.get_build_queue()
+
+        self.reset_triggers_list()
 
         DISPLAY.blit(self.get_image('background', 'starfield'), (0, 0))
 #        colony_screen.draw_planet_background(GUI, DISPLAY, IMAGES, PALETTES, planet.get_terrain(), planet.get_picture())
@@ -107,9 +113,13 @@ class ColonyProductionScreen(screen.Screen):
             print("production_id = %i" % production_id)
             production_name = RULES['buildings'][production_id]['name']
             print(production_id, production_name)
-            font3.write_text(DISPLAY, 13, y, production_name, dark_text_palette, 2)
             hover_id = "production:%i" % production_id
-            self.add_trigger({'action': "production", 'production_id': production_id, 'hover_id': hover_id, 'rect': pygame.Rect((13, y), (170, 12))})
+            if colony.in_build_queue(production_id):
+                font3.write_text(DISPLAY, 13, y, production_name, light_text_palette, 2)
+                self.add_trigger({'action': "remove_production", 'production_id': production_id, 'hover_id': hover_id, 'rect': pygame.Rect((13, y), (170, 12))})
+            else:
+                font3.write_text(DISPLAY, 13, y, production_name, dark_text_palette, 2)
+                self.add_trigger({'action': "production", 'production_id': production_id, 'hover_id': hover_id, 'rect': pygame.Rect((13, y), (170, 12))})
             y += 18
         print("=== /Available Buildings ===")
         print("")
@@ -126,7 +136,6 @@ class ColonyProductionScreen(screen.Screen):
             y += 19
 
         print("=== Build Queue ===")
-        build_queue = colony.get_build_queue()
         print(build_queue)
 
         label = font4.render("Build List for %s" % colony.get_name(), light_text_palette, 2)
@@ -207,6 +216,40 @@ class ColonyProductionScreen(screen.Screen):
         print("")
 
 
+    def process_trigger(self, trigger):
+        """ Colony production screen implements following triggers:
 
+            "production" = add production_id to the build queue
+        """
+        print("@ colony_production_screen::process_trigger()")
+        if trigger['action'] == "production":
+            print("    action: %s" % trigger['action'])
+            print("        production: %i" % trigger['production_id'])
+            self.__colony.add_build_item(trigger['production_id'])
+            self.redraw_flip()
+
+        if trigger['action'] == "remove_production":
+            print("    action: %s" % trigger['action'])
+            print("        production: %i" % trigger['production_id'])
+            self.__colony.remove_build_item(trigger['production_id'])
+            self.redraw_flip()
+
+
+    def enter(self):
+        print("@ colony_production_screen::enter()")
+        self.__old_build_queue = copy.copy(self.__colony.get_build_queue())
+        print("    self.__old_build_queue: %s" % str(self.__old_build_queue))
+        pass
+
+    def leave_confirm(self):
+        print("@ colony_production_screen::leave_confirm()")
+        # TODO: send the build queue to server
+        print("    (self.__colony.get_build_queue(): %s" % str(copy.copy(self.__colony.get_build_queue())))
+        networking.Client.set_colony_build_queue(self.__colony_id, self.__colony.get_build_queue())
+
+    def leave_cancel(self):
+        print("@ colony_production_screen::leave_cancel()")
+        print("    self.__old_build_queue: %s" % str(self.__old_build_queue))
+        self.__colony.set_build_queue(self.__old_build_queue)
 
 Screen = ColonyProductionScreen()

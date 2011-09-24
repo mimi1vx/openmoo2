@@ -4,6 +4,8 @@ import moo2
 import universe
 import rules
 
+import dictionary
+
 
 def stardate(i):
     s = str(i)
@@ -127,6 +129,9 @@ class Game(object):
         return sorted(techs)
     # /list_techs_by_area
 
+    def colony_owned_by(self, colony_id, player_id):
+        """ Returns true if the given colony_id belongs to an actual colony"""
+        return self.__colonies.has_key(colony_id) and self.__colonies[colony_id].is_owned_by(player_id)
 
     def recount_heroes(self):
         for hero_id, hero in self.__heroes.iteritems():
@@ -182,11 +187,32 @@ class Game(object):
         return True
     # /update_research
 
+    def set_colony_build_queue(self, player_id, colony_id, build_queue):
+        """ Sets a new build queue for a given colony_id owned by player_id
+
+        """
+        print("@ Game::set_colony_build_queue()")
+        print("    colony_id: %i" % colony_id)
+        print("    build_queue: %s" % str(build_queue))
+        if self.colony_owned_by(colony_id, player_id):
+            # TODO: validate the build queue:
+            #           all items must be available based on known technologies?
+            #           buildings can't be already present - remove duplicates or just fail?
+            #           check terraforming
+            #           check gravity generator
+            #           check artifical planet
+            #           check star system unique items (star gate, artemis ...)
+            #           what else?
+            #           IF ANY ERROR OCCURS DURING ABOVE CHECKS, METHOD SHOULD NOT SET THE NEW QUEUE BUT RETURN FALSE TO PREVENT CONFUSION
+            self.__colonies[colony_id].set_build_queue(build_queue)
+            return True
+
+        return False
+
     def recount_players(self):
         for player_id in self.__players:
             self.__players[player_id].set_research(0)
             self.__players[player_id].set_food(0)
-
 
         for colony_id in self.__colonies:
             if self.__colonies[colony_id].exists():
@@ -358,6 +384,34 @@ class Game(object):
                     if not self.__players[ship.get_owner()].knows_star_id(dest):
                         self.__players[ship.get_owner()].add_explored_star_id(dest)
 
+    def __colonies_production(self):
+        """ Simple colony production
+            Every turn, the first item from build queue is pulled and produced
+
+            TODO: implement colony and outpost ships production
+            TODO: implement regular ships production
+            TODO: implement housing
+            TODO: implement trade goods
+            TODO: implement terraforming
+            TODO: implement spies production
+            TODO: implement real production cost
+
+        """
+        print("@ game::__colonies_production()")
+        for colony_id, colony in self.__colonies.items():
+            colony.debug_production(self.__rules)
+#            for build_item in self.get_build_queue()[:
+            print(colony.list_buildings())
+            build_item = colony.get_build_item()
+            if build_item is not None:
+                production_id = build_item['production_id']
+                print build_item
+                if not self.__rules['buildings'][production_id].has_key('type') or self.__rules['buildings'][production_id]['type'] == "building":
+                    colony.add_building(production_id)
+                    colony.remove_build_item(production_id)
+                colony.debug_production(self.__rules)
+                print(colony.list_buildings())
+
     def next_turn(self):
 #        raise research_progress
 #        raise population
@@ -371,6 +425,8 @@ class Game(object):
         self.recount()
 
         self.__move_ships()
+
+        self.__colonies_production()
 
         for player_id in self.__players:
             player = self.__players[player_id]
@@ -473,16 +529,33 @@ class Game(object):
         
 
     def show_ships(self):
+        print("@ game::show_ships()")
         print
-        print("+---------+-----------------+----------+------------+----------------------------+-------+-------+")
-        print("| ship_id | owner           | status   | coords     | destination                | speed | turns |")
-        print("+---------+-----------------+----------+------------+----------------------------+-------+-------+")
+        print("+---------+------------------+-----------------+----------+------------+----------------------------+-------+-------+")
+        print("| ship_id | name             | owner           | status   | coords     | destination                | speed | turns |")
+        print("+---------+------------------+-----------------+----------+------------+----------------------------+-------+-------+")
         for ship_id, ship in self.__ships.items():
             if ship.exists():
                 dest = ship.get_destination()
                 dest_name = self.__stars[dest].get_name()
                 dest_x, dest_y = self.__stars[dest].get_coords()
 
-                print("| %7i | %15s | %8s | %4i, %4i | [%3i, %3i] %15s | %5i | %5i |" % (ship_id, self.__players[ship.get_owner()].get_race_name(), ship.get_status_text(), ship.get_x(), ship.get_y(), dest_x, dest_y, dest_name, ship.get_travelling_speed(), ship.get_turns_left()))
-        print("+---------+-----------------+----------+------------+----------------------------+-------+-------+")
+                print("| %7i | %16s | %15s | %8s | %4i, %4i | [%3i, %3i] %15s | %5i | %5i |" % (ship_id, ship.get_name(), self.__players[ship.get_owner()].get_race_name(), ship.get_status_text(), ship.get_x(), ship.get_y(), dest_x, dest_y, dest_name, ship.get_travelling_speed(), ship.get_turns_left()))
+        print("+---------+------------------+-----------------+----------+------------+----------------------------+-------+-------+")
         print
+
+        DICT = dictionary.get_dictionary()
+
+        for ship_id, ship in self.__ships.items():
+            design = ship.get_design()
+            print("    === ship_id # %i ===" % ship_id)
+#            print(design)
+            for dev_id in design['special_devices']:
+                print("        special device: %2i ... %s" % (dev_id, DICT['SHIP_SPECIALS'][dev_id]))
+            print
+
+#        i = 0
+#        print("<?xml version=\"1.0\"?>")
+#        for name in DICT['SHIP_SPECIALS']:
+#            print("<device id=\"%i\">\n\t<name>%s</name>\n</device>\n" % (i, name))
+#            i += 1
