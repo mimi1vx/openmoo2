@@ -4,7 +4,7 @@ import os
 import sys
 import argparse
 
-from .orion import MOO2Start
+from .orion import Orion
 from .orionexception import OrionException
 
 __version__ = '0.2.1'
@@ -54,7 +54,7 @@ def main():
     options = process_args(sys.argv[1:])
 
     try:
-        orion = MOO2Start(options)
+        orion = Orion(options)
         orion.run()
     except OrionException as exception:
         sys.stderr.write('ERROR: {0}\n'.format(exception))

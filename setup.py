@@ -32,7 +32,6 @@ setup(
 
     entry_points={
         'console_scripts': ['openmoo2 = openmoo2:main'],
-        'console_scripts': ['openmoo2-server = openmoo2:server']
     },
 )
 
