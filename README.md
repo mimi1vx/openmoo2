@@ -35,14 +35,14 @@ Original MOO2 game release
 Run "openmoo2-server" binary to execute the server.
  * by default the server listens on localhost on port 9999
  * the values can be changed using the command line options
-   * -h &gt;address&lt;
-   * -p &gt;port&lt;
-   * -g &gt;savegame file&lt;
+   * -h &lt;address&gt;
+   * -p &lt;port&gt;
+   * -g &lt;savegame file&gt;
 
 ### Running the game client
 
 Run "openmoo2" binary to start the game client.
  * by default the client connect to server running on localhost port 9999
  * the values can be changed using the command line options
-   * -h &gt;address&lt;
-   * -p &gt;port&lt;
+   * -h &lt;address&gt;
+   * -p &lt;port&gt;
