@@ -1,2 +1,4 @@
  * Get svg icon
  * Cleanup the logic in the openmoo2 so it actually loads
+   * Fix import lines in all py files
+   * Reorder the layout of the py files to be event separated
