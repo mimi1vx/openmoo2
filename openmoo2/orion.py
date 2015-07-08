@@ -3,13 +3,13 @@
 import sys
 import pygame
 
-import .cli
-import .networking
-import .game
-import .rules
-import .dictionary
-import .autoplayer
-import .gui
+import cli
+import networking
+import game
+import rules
+import dictionary
+import autoplayer
+import gui
 
 
 class Orion(object):
