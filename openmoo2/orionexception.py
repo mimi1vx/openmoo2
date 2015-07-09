@@ -1,7 +1,7 @@
 # vim: set ts=4 sw=4 et: coding=UTF-8
 
 
-class OrionDataException(Exception):
+class OrionException(Exception):
     """
     Class wrapping Exception class so we throw neat exceptions.
     """
