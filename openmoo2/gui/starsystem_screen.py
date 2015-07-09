@@ -1,10 +1,9 @@
 import pygame
 
 import screen
-import networking
-import gui
+from .. import networking
 
-from dictionary import greek_num
+from .. import dictionary
 
 import main_screen
 

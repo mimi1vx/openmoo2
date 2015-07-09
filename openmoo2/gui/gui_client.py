@@ -1,11 +1,10 @@
 import pygame
 from pygame.locals import *
 
-import lbx
+from .. import lbx
 import copy
 
-import networking
-import gui
+from .. import networking
 
 import splash_screen
 import main_screen

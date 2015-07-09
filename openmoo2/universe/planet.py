@@ -1,7 +1,6 @@
 from game_object import GameObject
-import lbx
-
-import dictionary
+from .. import lbx
+from .. import dictionary
 
 __author__="peterman"
 __date__ ="$May 16, 2010 11:00:06 AM$"

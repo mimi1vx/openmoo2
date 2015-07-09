@@ -2,10 +2,9 @@ import pygame
 from pygame.locals import *
 import copy
 
-import lbx
+from .. import lbx
 
-import networking
-import gui
+from .. import networking
 import gui_client
 
 GUI = gui_client.GuiClient()

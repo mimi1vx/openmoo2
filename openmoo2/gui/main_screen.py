@@ -1,10 +1,8 @@
 import pygame
 
 import screen
-import networking
-import gui
-
-from game import stardate
+from .. import networking
+from .. import game
 
 ship_tracks_bitmaps = (
     [0x001400, 0x001400, 0x043804, 0x087008, 0x489038, 0x489038, 0x087008, 0x043804],

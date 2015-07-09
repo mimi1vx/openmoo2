@@ -1,7 +1,5 @@
 import screen
 
-import gui
-
 class SplashScreen(screen.Screen):
 
     def __init__(self):

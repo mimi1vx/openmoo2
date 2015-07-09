@@ -1,10 +1,9 @@
 import pygame
-from _game_constants import *
+from .. import _game_constants
 
 import screen
-import networking
-import gui
-import dictionary
+from .. import networking
+from .. import dictionary
 
 class FleetScreen(screen.Screen):
 

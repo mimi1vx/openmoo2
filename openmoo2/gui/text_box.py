@@ -1,11 +1,10 @@
 import pygame
 import screen
 
-from _game_constants import *
+from .. import _game_constants
 
-import networking
-import gui
-import dictionary
+from .. import networking
+from .. import dictionary
 
 class TextBox(screen.Screen):
 

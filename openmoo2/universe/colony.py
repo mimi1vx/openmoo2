@@ -1,11 +1,11 @@
 import math
 
-import lbx
+from .. import lbx
 
-from _buildings import *
-from _game_constants import *
+from .. import _buildings
+from .. import _game_constants
 
-import rules
+from .. import rules
 #import universe
 
 from game_object import GameObject

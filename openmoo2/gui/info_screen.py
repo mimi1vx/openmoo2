@@ -1,11 +1,10 @@
 import pygame
-from _game_constants import *
+from .. import _game_constants
 
 import screen
-import networking
-import gui
+from .. import networking
 
-import dictionary
+from .. import dictionary
 
 class InfoScreen(screen.Screen):
 

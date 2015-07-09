@@ -1,8 +1,7 @@
 import screen
 import pygame
 
-import networking
-import gui
+from .. import networking
 
 class LeadersScreen(screen.Screen):
 

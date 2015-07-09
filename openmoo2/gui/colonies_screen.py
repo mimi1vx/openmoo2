@@ -1,8 +1,7 @@
 import pygame
 import screen
 
-import networking
-import gui
+from .. import networking
 
 class ColoniesScreen(screen.Screen):
 

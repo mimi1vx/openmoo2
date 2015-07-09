@@ -2,14 +2,13 @@ import copy
 
 import pygame
 
-from _game_constants import *
+from .. import _game_constants
 
 import screen
 
-from _buildings import *
+from .. import _buildings
 
-import networking
-import gui
+from .. import networking
 
 class ColonyProductionScreen(screen.Screen):
 

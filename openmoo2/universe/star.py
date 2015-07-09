@@ -1,5 +1,5 @@
-import lbx
-from savegame import bitmask_to_player_id_list
+from .. import lbx
+from .. import savegame
 from space_object import SpaceObject
 
 __author__ = "peterman"
