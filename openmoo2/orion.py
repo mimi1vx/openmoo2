@@ -21,7 +21,7 @@ class Orion(object):
 
     def __init__(self, options): 
         self.options = options
-        self.moo2_dir = OrionDataLoader.find_lbx_datadir()
+        self.moo2_dir = OrionDataLoader.provide_lbx_datadir()
 
     def start_server(self):
         """

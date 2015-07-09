@@ -5,6 +5,7 @@ from .. import lbx
 import copy
 
 from .. import networking
+from .. import oriondataloader
 
 import splash_screen
 import main_screen
@@ -33,7 +34,9 @@ class GuiClient(object):
     __mouse_pos = (0, 0)
 
     def __init__(self):
-        self.__graphic_ini = self.__read_text_file("../graphic.ini")
+        dataloader = OrionDataLoader()
+
+        self.__graphic_ini = self.__read_text_file("{0}/graphic.ini".format(dataloader.provide_datadir()))
         self.highlight_triggers_on()
 
     def init(self, moo2_dir):
