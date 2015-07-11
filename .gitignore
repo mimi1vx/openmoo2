@@ -33,6 +33,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+*.dist-info/
 
 # Installer logs
 pip-log.txt
