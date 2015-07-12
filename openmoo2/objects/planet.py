@@ -1,6 +1,6 @@
 # vim: set ts=4 sw=4 et: coding=UTF-8
 
-from .. import probabilities
+from ..probabilities import determine_probability, get_50_50
 
 class Planet(object):
     """
@@ -9,8 +9,8 @@ class Planet(object):
     """
 
     # FIXME: read this from game configuration
-    mineral_rich=False
-    organic_rich=False
+    mineral_rich = False
+    organic_rich = False
 
     # Default planet identifiers
     # type of planet: normal, asteroids, gas giant, ...
@@ -20,7 +20,7 @@ class Planet(object):
     # minerals of the planet Ultra rich -> Ultra poor
     minerals = None
     # radiated/Toxic -> Gaia
-    biology = "Barren"
+    biology = None
     # gravitation of planet
     gravity = None
     # have native inhabitants?
