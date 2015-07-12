@@ -1,0 +1,11 @@
+language: python
+python:
+  - "2.7"
+  - "3.4"
+install:
+  - pip install python-coveralls mock
+  - sudo apt-get install -y rpm
+script:
+  - nosetests --with-coverage --cover-package=openmoo2 --cover-inclusive
+after_success:
+  - coveralls
