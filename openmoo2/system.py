@@ -7,8 +7,6 @@ class StarSystem(object):
     """
 
     # Default system identifiers
-    # size of the system (number of planets)
-    size = 0
     # position on map
     position_x = 0
     position_y = 0
@@ -18,3 +16,5 @@ class StarSystem(object):
     stranded_leader = None
     # or even ships?
     stranded_ship = None
+    # planets
+    planets = set()
