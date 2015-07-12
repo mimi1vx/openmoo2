@@ -19,3 +19,5 @@ class Planet(object):
     artefacts = False
     # have gold deposits?
     gold_deposits = False
+    # have gem deposits?
+    gem_deposits = False

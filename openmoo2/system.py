@@ -16,5 +16,9 @@ class StarSystem(object):
     stranded_leader = None
     # or even ships?
     stranded_ship = None
+    # stable wormhole
+    stable_wormhole = None
+    # unstable wormhole
+    unstable_wormhole = None
     # planets
     planets = set()
