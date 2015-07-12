@@ -2,7 +2,7 @@
 
 from .orionexception import OrionException
 
-class OrionDataLoader(Object):
+class OrionDataLoader(object):
     """
     Class providing interface to load various datafiles
     """
