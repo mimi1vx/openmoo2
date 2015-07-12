@@ -43,8 +43,9 @@ class Planet(object):
         if self.homeworld:
             return "Normal"
 
-        # We can be 3 types: normal, asteroids or gas giant
         """
+        We can be 3 types:
+        Normal, Asteroids, Gas giant
         30% asteroids/gas-giant
         70% planet
         """
@@ -72,10 +73,8 @@ class Planet(object):
         4.6 Huge/Tiny
         """
         if determine_probability(4.6):
-            # Huge/Tiny
             return get_50_50("Huge", "Tiny")
         if determine_probability(27.2):
-            # Large/Small
             return get_50_50("Large", "Small")
         return "Normal"
 
@@ -86,7 +85,9 @@ class Planet(object):
 
         # Determine unverse layout
         penalty = 0
+        probability_skew = 0
         if self.mineral_rich:
+            probability_skew = 5
             penalty = -15
         if self.organic_rich:
             penalty = 15
@@ -105,11 +106,9 @@ class Planet(object):
         27.2 Rich/Poor
         4.6 Ultra rich/Ultra poor
         """
-        if determine_probability(4.6):
-            # Huge/Tiny
+        if determine_probability(4.6 + probability_skew):
             return get_50_50("Rich", "Poor", penalty)
-        if determine_probability(27.2):
-            # Large/Small
+        if determine_probability(27.2 + probability_skew):
             return get_50_50("Ultra rich", "Ultra poor", penalty)
         return "Abundant"
 
@@ -118,18 +117,61 @@ class Planet(object):
         Figure out minerals for the planet
         """
 
+        # Determine unverse layout
+        probability_skew = 0
+        if self.mineral_rich:
+            probability_skew = -5
+        if self.organic_rich:
+            probability_skew = 5
+
         # Homeworld value
         if self.homeworld:
             # FIXME: user can specify different values when creating race
             return "Terran"
 
+        # For future planet creation we can consider these barren
+        if not self.setup == "Normal":
+            return "Barren"
+
         """
         We can have following types:
+        0    1      2             3                4                 5
         Gaia/Terran/(Swamp/Ocean)/(Tundra/Dessert)/(Barren/Radiated)/Toxic
         We will use normal distribution, but can skew in/out depending
         on game settings for the play:
-        TODO
+        6% 0
+        10% 1
+        19% 2 or 3 in organic_rich
+        36% 3 or 4 in mineral_rich or 2 in organic_rich
+        19% 4 or 3 in mineral_rich
+        10% 5
         """
+        if determine_probability(6 + probability_skew):
+            return "Gaia"
+        if determine_probability(10 + probability_skew):
+            return "Terran"
+        if determine_probability(19):
+            if self.organic_rich:
+                return get_50_50("Tundra", "Dessert")
+            else:
+                return get_50_50("Swamp", "Ocean")
+        if determine_probability(36 + probability_skew):
+            if self.mineral_rich:
+                return get_50_50("Barren", "Radiated")
+            elif self.organic_rich:
+                return get_50_50("Swamp", "Ocean")
+            else:
+                return get_50_50("Tundra", "Dessert")
+        if determine_probability(19):
+            if self.mineral_rich:
+                return get_50_50("Tundra", "Dessert")
+            else:
+                return get_50_50("Barren", "Radiated")
+        if determine_probability(10):
+            return "Toxic"
+
+        # If user got here he is not lucky one
+        return get_50_50("Barren", "Radiated")
 
     def __init__(self, user_planet=False):
         """
