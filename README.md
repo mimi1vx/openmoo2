@@ -1,5 +1,7 @@
 # OpenMOO2
 
+[![Build Status](https://travis-ci.org/scarabeusiv/openmoo2.svg?branch=master)](https://travis-ci.org/scarabeusiv/openmoo2)
+
 open source clone of Microprose game "Master of Orion II: Battle at Antares"
 
 ## General info
