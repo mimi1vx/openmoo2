@@ -1,5 +1,7 @@
 # vim: set ts=4 sw=4 et: coding=UTF-8
 
+import .oriondataloader
+
 class Orion(object):
     """
     Main object creating the game up to our likings
@@ -7,9 +9,10 @@ class Orion(object):
 
     options = None
 
-    def __init__(self, options): 
+    def __init__(self, options):
         self.options = options
-        self.moo2_dir = OrionDataLoader.provide_lbx_datadir()
+        dataloader = OrionDataLoader()
+        self.moo2_dir = dataloader.provide_lbx_datadir()
 
     def start_server(self):
         """
@@ -25,5 +28,5 @@ class Orion(object):
 
     def run(self):
         self.start_server()
-        if not option.server:
+        if not self.options['server']:
             self.start_client()
