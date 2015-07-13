@@ -11,7 +11,7 @@ class TestPlanet(object):
     @classmethod
     def setup_class(cls):
         cls.random_planet = planet.Planet()
-        cls.random_planet.randomize_planet()
+        cls.random_planet.randomize()
 
     def test_planet_setup(self):
         ok_(self.random_planet.setup is not None, "random planet has setup 'None'")

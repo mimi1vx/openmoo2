@@ -34,7 +34,7 @@ class Planet(object):
     # have gem deposits?
     gem_deposits = False
 
-    def __determine_planet_type(self):
+    def __determine_type(self):
         """
         Figure out what type the planet wil be
 
@@ -48,7 +48,7 @@ class Planet(object):
             return get_50_50("Asteroids", "Gas giant")
         return "Normal"
 
-    def __determine_planet_size(self):
+    def __determine_size(self):
         """
         Figure out size for the planet
 
@@ -59,13 +59,18 @@ class Planet(object):
         27.2 Large/Small
         4.6 Huge/Tiny
         """
+
+        # Gas giant can be only Large/Huge
+        if self.setup == "Gas giant":
+            return get_50_50("Huge", "Large")
+
         if determine_probability(4.6):
             return get_50_50("Huge", "Tiny")
         if determine_probability(27.2):
             return get_50_50("Large", "Small")
         return "Normal"
 
-    def __determine_planet_minerals(self):
+    def __determine_minerals(self):
         """
         Figure out minerals for the planet
         """
@@ -94,7 +99,7 @@ class Planet(object):
             return get_50_50("Ultra rich", "Ultra poor", penalty)
         return "Abundant"
 
-    def __determine_planet_biology(self):
+    def __determine_biology(self):
         """
         Figure out minerals for the planet
         """
@@ -150,7 +155,7 @@ class Planet(object):
         # If user got here he is not lucky one
         return get_50_50("Barren", "Radiated")
 
-    def __determine_planet_gravity(self):
+    def __determine_gravity(self):
         """
         Figure out gravitation on the planet
 
@@ -219,14 +224,14 @@ class Planet(object):
         """
         return
 
-    def randomize_planet(self):
+    def randomize(self):
         """
         Radomize content of the planet for space creation
         """
-        self.setup = self.__determine_planet_type()
-        # we determine size/minerals for future create planet tech
-        self.size = self.__determine_planet_size()
-        self.minerals = self.__determine_planet_minerals()
-        self.biology = self.__determine_planet_biology()
-        self.gravity = self.__determine_planet_gravity()
+        self.setup = self.__determine_type()
+        # we determine size/minerals for future planetary creation from asteroids/etc
+        self.size = self.__determine_size()
+        self.minerals = self.__determine_minerals()
+        self.biology = self.__determine_biology()
+        self.gravity = self.__determine_gravity()
         self.__determine_specialities()
