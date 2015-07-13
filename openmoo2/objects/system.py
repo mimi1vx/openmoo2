@@ -1,5 +1,6 @@
 # vim: set ts=4 sw=4 et: coding=UTF-8
 
+from ..probabilities import determine_probability, get_50_50
 from .planet import Planet
 
 
@@ -39,7 +40,7 @@ class StarSystem(object):
 
     def __determine_planets(self):
         """
-        Decide how many and what planets we will have
+        Decide how many and what planets we will have.
         """
         planet_count = 0
         planet = None
@@ -56,7 +57,6 @@ class StarSystem(object):
             planet = Planet()
             planet.randomize()
             self.planets.append(planet)
-
 
     def __determine_specialities(self):
         """
