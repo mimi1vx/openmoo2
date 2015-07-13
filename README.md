@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/scarabeusiv/openmoo2.svg?branch=master)](https://travis-ci.org/scarabeusiv/openmoo2)
 [![Coverage Status](https://coveralls.io/repos/scarabeusiv/openmoo2/badge.svg?branch=master&service=github)](https://coveralls.io/github/scarabeusiv/openmoo2?branch=master)
+[![Code Health](https://landscape.io/github/scarabeusiv/openmoo2/master/landscape.svg?style=flat)](https://landscape.io/github/scarabeusiv/openmoo2/master)
 
 open source clone of Microprose game "Master of Orion II: Battle at Antares"
 
