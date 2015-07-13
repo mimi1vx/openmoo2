@@ -30,5 +30,5 @@ class TestPlanet(object):
         ok_(self.home_planet.minerals == "Abundant", "home planet has another minerals than 'Abundant'")
 
     def test_planet_gravity(self):
-        """TODO : add with random generator for gravity"""
-        pass
+        ok_(self.random_planet.gravity is not None, "random planet has gravity 'None'")
+        ok_(self.home_planet.gravity == "Normal", "home planet has another gravity than 'Normal'")

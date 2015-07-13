@@ -175,6 +175,41 @@ class Planet(object):
         # If user got here he is not lucky one
         return get_50_50("Barren", "Radiated")
 
+    def __determine_planet_gravity(self):
+        """
+        Figure out gravitation on the planet
+        """
+
+        # Homeworld value
+        if self.homeworld:
+            # FIXME: user can specify different values when creating race
+            return "Normal"
+
+        """
+        We can have following types:
+        Low/Normal/High
+        For the distribution we actually need to take planet size in the
+        account:
+        tiny/small -> low, normal gravity
+        normal -> low, normal, high gravity
+        large/huge -> normal, high gravity
+        """
+
+        if self.size == "Tiny":
+            return get_50_50("Low", "Normal")
+        if self.size == "Small":
+            return get_50_50("Low", "Normal", 15)
+        if self.size == "Normal":
+            if determine_probability(15):
+                return "Low"
+            if determine_probability(15):
+                return "High"
+            return "Normal"
+        if self.size == "Large":
+            return get_50_50("High", "Normal", 15)
+        if self.size == "Huge":
+            return get_50_50("High", "Normal")
+
     def __init__(self, user_planet=False):
         """
         Generate new planet
@@ -188,3 +223,4 @@ class Planet(object):
         self.size = self.__determine_planet_size()
         self.minerals = self.__determine_planet_minerals()
         self.biology = self.__determine_planet_biology()
+        self.gravity = self.__determine_planet_gravity()
