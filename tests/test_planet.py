@@ -7,7 +7,7 @@ from nose.tools import ok_
 from openmoo2.objects import planet
 
 
-class Test_Planet(object):
+class TestPlanet(object):
     @classmethod
     def setup_class(cls):
         cls.random_planet = planet.Planet()
