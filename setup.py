@@ -15,6 +15,10 @@ setup(
 
     version=__version__,
 
+    test_require=[
+        "nose",
+    ],
+
     author='Petr Mika',
     author_email='peterman@email.cz',
 
@@ -27,11 +31,9 @@ setup(
 
     packages=['openmoo2'],
 
-    data_files=[('/usr/share/openmoo2/', glob.glob('data/*')),
-    ],
+    data_files=[('/usr/share/openmoo2/', glob.glob('data/*')), ],
 
     entry_points={
         'console_scripts': ['openmoo2 = openmoo2:main'],
     },
 )
-
