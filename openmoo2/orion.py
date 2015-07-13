@@ -1,6 +1,6 @@
 # vim: set ts=4 sw=4 et: coding=UTF-8
 
-import .oriondataloader
+from .oriondataloader import OrionDataLoader
 
 
 class Orion(object):
