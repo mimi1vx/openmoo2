@@ -33,8 +33,6 @@ class Planet(object):
     gold_deposits = False
     # have gem deposits?
     gem_deposits = False
-    # homeworld?
-    homeworld = False
 
     def __determine_planet_type(self):
         """
@@ -180,6 +178,41 @@ class Planet(object):
         if self.size == "Huge":
             return get_50_50("High", "Normal")
 
+    def __determine_specialities(self):
+        """
+        Decide all various special factors for the planet
+        """
+
+        # If the planet can support life it might already have some
+        if self.biology == "Gaia":
+            if determine_probability(15):
+                self.natives = True
+        if self.biology == "Terran":
+            if determine_probability(10):
+                self.natives = True
+
+        # On life supporting planets there might've been civilization
+        if self.biology == "Gaia" or self.biology == "Terran":
+            if determine_probability(10):
+                self.artefacts = True
+
+        # Based on planet minerals we can get extra perks
+        if self.minerals == "Ultra rich":
+            if determine_probability(15):
+                self.gem_deposits = True
+            if determine_probability(15) and not self.gem_deposits:
+                self.gold_deposits = True
+        if self.minerals == "Rich":
+            if determine_probability(10):
+                self.gem_deposits = True
+            if determine_probability(10) and not self.gem_deposits:
+                self.gold_deposits = True
+        if self.minerals == "Abundant":
+            if determine_probability(5):
+                self.gem_deposits = True
+            if determine_probability(5) and not self.gem_deposits:
+                self.gold_deposits = True
+
     def __init__(self):
         """
         Generate new planet
@@ -196,3 +229,4 @@ class Planet(object):
         self.minerals = self.__determine_planet_minerals()
         self.biology = self.__determine_planet_biology()
         self.gravity = self.__determine_planet_gravity()
+        self.__determine_specialities()
