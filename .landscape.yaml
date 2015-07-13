@@ -2,6 +2,7 @@ test-warnings: yes
 doc-warnings: yes
 strictness: veryhigh
 autodetect: yes
+max-line-length: 99
 
 ignore-paths:
         - oldmess
