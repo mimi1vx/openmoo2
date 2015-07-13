@@ -36,7 +36,7 @@ class Planet(object):
 
     def __determine_type(self):
         """
-        Figure out what type the planet wil be
+        Figure out what type the planet wil be.
 
         We can be 3 types:
         Normal, Asteroids, Gas giant
@@ -50,7 +50,7 @@ class Planet(object):
 
     def __determine_size(self):
         """
-        Figure out size for the planet
+        Figure out size for the planet.
 
         We can have following types:
         Huge, Large, Medium, Small, tiny
@@ -72,7 +72,7 @@ class Planet(object):
 
     def __determine_minerals(self):
         """
-        Figure out minerals for the planet
+        Figure out minerals for the planet.
         """
 
         # Determine unverse layout
@@ -101,7 +101,7 @@ class Planet(object):
 
     def __determine_biology(self):
         """
-        Figure out minerals for the planet
+        Figure out minerals for the planet.
         """
 
         # Determine unverse layout
@@ -157,7 +157,7 @@ class Planet(object):
 
     def __determine_gravity(self):
         """
-        Figure out gravitation on the planet
+        Figure out gravitation on the planet.
 
         We can have following types:
         Low/Normal/High
@@ -185,7 +185,7 @@ class Planet(object):
 
     def __determine_specialities(self):
         """
-        Decide all various special factors for the planet
+        Decide all various special factors for the planet.
         """
 
         # If the planet can support life it might already have some
@@ -220,13 +220,13 @@ class Planet(object):
 
     def __init__(self):
         """
-        Generate new planet
+        Generate new planet.
         """
         return
 
     def randomize(self):
         """
-        Radomize content of the planet for space creation
+        Radomize content of the planet for space creation.
         """
         self.setup = self.__determine_type()
         # we determine size/minerals for future planetary creation from asteroids/etc
@@ -235,3 +235,8 @@ class Planet(object):
         self.biology = self.__determine_biology()
         self.gravity = self.__determine_gravity()
         self.__determine_specialities()
+
+    def print_state(self):
+        """
+        Nicely print the state of the planet.
+        """

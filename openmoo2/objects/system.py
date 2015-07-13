@@ -24,3 +24,16 @@ class StarSystem(object):
     unstable_wormhole = None
     # planets
     planets = set()
+
+    def __init__(self):
+        """
+        Generate new star system
+        """
+        return
+
+    def randomize(self):
+        """
+        Radomize content of the star system for space creation
+        """
+        # Here we do not create stable wormhole and position as
+        # those values must came from the whole universe layout
