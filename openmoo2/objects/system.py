@@ -1,11 +1,12 @@
 # vim: set ts=4 sw=4 et: coding=UTF-8
 
+from .planet import Planet
+
 
 class StarSystem(object):
 
     """
-    Object containing all information and
-    getters for Star systems
+    Object containing all information and getters for Star systems.
     """
 
     # Default system identifiers
@@ -23,17 +24,71 @@ class StarSystem(object):
     # unstable wormhole
     unstable_wormhole = None
     # planets
-    planets = set()
+    planets = list()
+
+    def __determine_unstable_wormhole(self):
+        """
+        Decide if the star system will be ok or just ugly
+        traffic blocking wormhole.
+        """
+
+        if determine_probability(5):
+            # Bad luck buddy
+            return True
+        return False
+
+    def __determine_planets(self):
+        """
+        Decide how many and what planets we will have
+        """
+        planet_count = 0
+        planet = None
+
+        # We can have 0 - 4 planets
+        if determine_probability(4.6):
+            planet_count = get_50_50(0, 4)
+        elif determine_probability(27.2):
+            planet_count = get_50_50(1, 3)
+        else:
+            planet_count = 2
+
+        for i in range(0, planet_count):
+            planet = Planet()
+            planet.randomize()
+            self.planets.append(planet)
+
+
+    def __determine_specialities(self):
+        """
+        Decide all various special factors for the star system.
+        """
+
+        if determine_probability(5):
+            # FIXME: Set this to leader object
+            self.stranded_leader = True
+            return
+        if determine_probability(5):
+            # FIXME: Set this to some ship object
+            self.stranded_ship = True
+            return
+        if determine_probability(5):
+            # FIXME: Set this to some beast object
+            self.beast = True
 
     def __init__(self):
         """
-        Generate new star system
+        Generate new star system.
         """
         return
 
     def randomize(self):
         """
-        Radomize content of the star system for space creation
+        Radomize content of the star system for space creation.
         """
         # Here we do not create stable wormhole and position as
         # those values must came from the whole universe layout
+        self.unstable_wormhole = self.__determine_unstable_wormhole()
+        # And anything worth setting values is only in non-wormhole setup
+        if not self.unstable_wormhole:
+            self.__determine_planets()
+            self.__determine_specialities()
