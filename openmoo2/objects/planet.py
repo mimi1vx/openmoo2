@@ -39,13 +39,7 @@ class Planet(object):
     def __determine_planet_type(self):
         """
         Figure out what type the planet wil be
-        """
 
-        # well we can't have homewrold on asteroids, can we
-        if self.homeworld:
-            return "Normal"
-
-        """
         We can be 3 types:
         Normal, Asteroids, Gas giant
         30% asteroids/gas-giant
@@ -59,14 +53,7 @@ class Planet(object):
     def __determine_planet_size(self):
         """
         Figure out size for the planet
-        """
 
-        # Homeworld value
-        if self.homeworld:
-            # FIXME: user can specify different values when creating race
-            return "Medium"
-
-        """
         We can have following types:
         Huge, Large, Medium, Small, tiny
         Using normal distribtuion:
@@ -94,11 +81,6 @@ class Planet(object):
         if self.organic_rich:
             penalty = 15
 
-        # Homeworld value
-        if self.homeworld:
-            # FIXME: user can specify different values when creating race
-            return "Abundant"
-
         """
         We can have following types:
         Ultra rich, Rich, Abundant, Poor, Ultra poor
@@ -125,11 +107,6 @@ class Planet(object):
             probability_skew = -5
         if self.organic_rich:
             probability_skew = 5
-
-        # Homeworld value
-        if self.homeworld:
-            # FIXME: user can specify different values when creating race
-            return "Terran"
 
         # For future planet creation we can consider these barren
         if not self.setup == "Normal":
@@ -178,14 +155,7 @@ class Planet(object):
     def __determine_planet_gravity(self):
         """
         Figure out gravitation on the planet
-        """
 
-        # Homeworld value
-        if self.homeworld:
-            # FIXME: user can specify different values when creating race
-            return "Normal"
-
-        """
         We can have following types:
         Low/Normal/High
         For the distribution we actually need to take planet size in the
@@ -210,14 +180,16 @@ class Planet(object):
         if self.size == "Huge":
             return get_50_50("High", "Normal")
 
-    def __init__(self, user_planet=False):
+    def __init__(self):
         """
         Generate new planet
-        param: user_planet bool wether to create race homeworld
         """
+        return
 
-        self.homeworld = user_planet
-
+    def randomize_planet(self):
+        """
+        Radomize content of the planet for space creation
+        """
         self.setup = self.__determine_planet_type()
         # we determine size/minerals for future create planet tech
         self.size = self.__determine_planet_size()
