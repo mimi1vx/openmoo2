@@ -3,14 +3,15 @@
 import os
 from .orionexception import OrionException
 
+
 class OrionDataLoader(object):
+
     """
     Class providing interface to load various datafiles
     """
 
     def __init__(self):
         self.datadir = self.find_datadir()
-
 
     def find_datadir(self):
         """

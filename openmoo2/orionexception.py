@@ -2,6 +2,7 @@
 
 
 class OrionException(Exception):
+
     """
     Class wrapping Exception class so we throw neat exceptions.
     """

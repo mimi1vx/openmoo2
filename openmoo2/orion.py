@@ -2,7 +2,9 @@
 
 import .oriondataloader
 
+
 class Orion(object):
+
     """
     Main object creating the game up to our likings
     """

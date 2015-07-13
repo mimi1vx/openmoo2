@@ -2,7 +2,9 @@
 
 from ..probabilities import determine_probability, get_50_50
 
+
 class Planet(object):
+
     """
     Object containing all information and
     getters for Planets

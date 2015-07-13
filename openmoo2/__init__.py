@@ -8,6 +8,7 @@ from .orionexception import OrionException
 
 __version__ = '0.2.1'
 
+
 def process_args(argv):
     """
     Process the parsed arguments and return the result
@@ -15,8 +16,8 @@ def process_args(argv):
     """
 
     parser = argparse.ArgumentParser(prog='openmoo2',
-                        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-                        description='OpenMOO2 is opensource reimplementation of MOO2')
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                     description='OpenMOO2 is opensource reimplementation of MOO2')
 
     parser.add_argument('-p', '--port', action='store_true', default=9999,
                         help='port the game will comunicate on/with')
@@ -43,6 +44,7 @@ def process_args(argv):
     }
 
     return options_dict
+
 
 def main():
     """

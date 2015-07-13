@@ -1,6 +1,8 @@
 # vim: set ts=4 sw=4 et: coding=UTF-8
 
+
 class StarSystem(object):
+
     """
     Object containing all information and
     getters for Star systems
