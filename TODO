@@ -1,7 +1,8 @@
  * Get svg icon
- * Cleanup the logic in the openmoo2 so it actually loads
-   * Fix import lines in all py files
-   * Reorder the layout of the py files to be event separated
+ * Get the basic logic running without the gui:
+   * Stars, battles, etc
+   * Generate own universe
+   * Have own datafiles and rely on lbx only for graphics
  * Change game engine
    * one of : Kivy
               cocos2d
