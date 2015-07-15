@@ -94,9 +94,9 @@ class Planet(object):
         4.6 Ultra rich/Ultra poor
         """
         if determine_probability(4.6 + probability_skew):
-            return get_50_50("Rich", "Poor", penalty)
-        if determine_probability(27.2 + probability_skew):
             return get_50_50("Ultra rich", "Ultra poor", penalty)
+        if determine_probability(27.2 + probability_skew):
+            return get_50_50("Rich", "Poor", penalty)
         return "Abundant"
 
     def __determine_biology(self):
