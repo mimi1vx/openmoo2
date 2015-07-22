@@ -14,6 +14,8 @@ class StarSystem(object):
     # position on map
     position_x = 0
     position_y = 0
+    # color of system
+    color = None
     # have some space beast
     beast = None
     # have some stranded leaders?
@@ -45,17 +47,17 @@ class StarSystem(object):
         planet_count = 0
         planet = None
 
-        # We can have 0 - 4 planets
+        # We can have 0 - 5 planets
         if determine_probability(4.6):
-            planet_count = get_50_50(0, 4)
+            planet_count = get_50_50(0, 5)
         elif determine_probability(27.2):
-            planet_count = get_50_50(1, 3)
+            planet_count = get_50_50(1, 4)
         else:
-            planet_count = 2
+            planet_count = get_50_50(2, 3)
 
         for i in range(0, planet_count):
             planet = Planet()
-            planet.randomize()
+            planet.randomize(self.color)
             self.planets.append(planet)
 
     def __determine_specialities(self):
