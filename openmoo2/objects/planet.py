@@ -11,6 +11,7 @@ class Planet(object):
     """
 
     # FIXME: read this from game configuration
+    # change to Universe Age
     mineral_rich = False
     organic_rich = False
 
@@ -224,6 +225,7 @@ class Planet(object):
         """
         return
 
+    # FIXME: integrate color of star in system
     def randomize(self):
         """
         Radomize content of the planet for space creation.
