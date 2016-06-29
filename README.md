@@ -27,6 +27,9 @@ Original MOO2 game release
 ### Installation
 
  * Install python 2.7 or newer on your system
+ * Install [setuptools][1]
  * Use python setup.py to install the package
  * copy/link original MOO2 game data (.LBX files) to proper location as
    prompted by game
+
+[1]: https://pypi.python.org/pypi/setuptools
