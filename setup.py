@@ -1,9 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 """Setup file for easy installation."""
 from setuptools import setup
-import glob
 from openmoo2 import __version__
 
 setup(
@@ -12,10 +11,10 @@ setup(
     long_description='open source clone of Microprose game "Master of Orion II: Battle at Antares"',
     url='http://openmoo2.org/',
     download_url='https://github.com/scarabeusiv/openmoo2',
-
+    include_package_data=True,
     version=__version__,
 
-    test_require=[
+    tests_require=[
         "nose",
     ],
 
@@ -30,8 +29,6 @@ setup(
     keywords=['Strategy', 'Game'],
 
     packages=['openmoo2'],
-
-    data_files=[('/usr/share/openmoo2/', glob.glob('data/*')), ],
 
     entry_points={
         'console_scripts': ['openmoo2 = openmoo2:main'],
