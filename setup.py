@@ -15,7 +15,7 @@ setup(
 
     version=__version__,
 
-    test_require=[
+    tests_require=[
         "nose",
     ],
 
