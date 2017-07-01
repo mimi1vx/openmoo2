@@ -10,9 +10,8 @@ planetgravity = {"tiny": {"ultrapoor": "low", "poor": "low", "average": "low", "
 
 
 class Planet(object):
-    """
-    object holding information about planet
-    """
+
+    """object holding information about planet."""
 
     def __init__(self, kind, **kwarg):
         if kind not in ("asteroids", "giant", "planet"):
@@ -21,7 +20,10 @@ class Planet(object):
         self._gravity = None
         self.kind = kind
 
-        if kind in ("asteroids", "giant"):
+        if kind == "asteroids":
+            return
+        if kind == "giant":
+            self.outpost = kwarg['outpost'] if 'outpost' in kwarg else None
             return
 
         for i in ("size", "organic", "mineral", "environment"):
@@ -35,6 +37,8 @@ class Planet(object):
         self.colony = kwarg['colony'] if 'colony' in kwarg else None
         if not self.colony:
             self.outpost = kwarg['outpost'] if 'outpost' in kwarg else None
+        else:
+            self.outpost = None
 
         if 'gravity' in kwarg:
             self.gravity = kwarg['gravity']
@@ -46,20 +50,28 @@ class Planet(object):
 
     @property
     def gravity(self):
+        """Set gravity of planet."""
         return self._gravity
 
     @gravity.setter
     def gravity(self, value):
-        if value not in ("low", "medium", "heavy") and self.kind != "planet":
+        if self.kind == 'asteroids' and value is not None:
+            raise Exception  # TODO: specific exception
+        if value not in ('low', 'medium', 'heavy', None):
+            raise Exception  # TODO: specific exception
+        if self.kind not in ('planet', 'asteroids'):
             raise Exception  # TODO: specific exception
         self._gravity = value
 
     @gravity.getter
     def gravity(self):
-        if self.kind != "planet":
+        if self.kind == 'asteroids':
+            del self.gravity
+        elif self.kind == 'planet':
+            if not self._gravity:
+                self._gravity = planetgravity[self.size][self.mineral]
+        else:
             raise Exception  # TODO: specific exception
-        if not self._gravity:
-            self._gravity = planetgravity[self.size][self.mineral]
         return self._gravity
 
     @gravity.deleter
@@ -68,9 +80,7 @@ class Planet(object):
 
     # destroy planet --> stellar converter --> reinit as asteroids
     def destroy_planet(self):
-        """
-        Sets planet as asteroid field and sets all planet attributes to None/False
-        """
+        """Set planet as asteroid field and sets all planet attributes to None/False."""
         self.gravity = None
         self.kind = 'asteroids'
         self.size = None
