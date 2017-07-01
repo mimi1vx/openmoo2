@@ -1,8 +1,10 @@
+python-targets: 3
 test-warnings: yes
 doc-warnings: yes
 strictness: veryhigh
 autodetect: yes
-max-line-length: 99
+max-line-length:  120
+
 
 ignore-paths:
         - oldmess
