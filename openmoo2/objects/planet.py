@@ -92,6 +92,29 @@ class Planet(object):
         self.homeworld = False
         self.environment = None
 
+    def create_planet(self, **kwarg):
+        """Oposite of destroy_planet"""
+        if self.kind not in ('giant', 'asteroids'):
+            raise Exception  # TODO: specific exception
+
+        for i in ("size", "organic", "mineral", "environment"):
+            if i not in kwarg:
+                raise Exception  # TODO specific exception for missing
+
+        if self.kind == 'giant':
+            self.outpost = None
+
+        self.kind = 'planet'
+        self.size = kwarg['size']
+        self.organic = kwarg['organic']
+        self.mineral = kwarg['mineral']
+        self.environment = kwarg['environment']
+
+        if 'gravity' in kwarg:
+            self.gravity = kwarg['gravity']
+        else:
+            self.gravity
+
     def __str__(self):
         if self.kind == 'asteroids':
             tmpstr = "This is asteroids field"

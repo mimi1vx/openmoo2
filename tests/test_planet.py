@@ -113,6 +113,62 @@ class TestPlanet(object):
         planetx.destroy_planet()
         eq_(planetx.kind, 'asteroids')
 
+    def test_create_planet_asteroids(self):
+        planetx = Planet('asteroids')
+        planetx.create_planet(size='medium', organic='average', mineral='rich', environment='barren')
+        eq_(planetx.gravity, 'medium')
+
+    def test_create_planet_giant(self):
+        planetx = Planet('giant')
+        planetx.create_planet(size='medium', organic='average', mineral='rich', environment='barren')
+        eq_(planetx.gravity, 'medium')
+
+    def test_create_planet_giant_outpost(self):
+        planetx = Planet('giant')
+        planetx.create_planet(
+            size='medium',
+            organic='average',
+            mineral='rich',
+            environment='barren',
+            outpost=self.outpost)
+        eq_(planetx.gravity, 'medium')
+        eq_(planetx.outpost, None)
+
+    def test_create_planet_asteroids_gravity(self):
+        planetx = Planet('asteroids')
+        planetx.create_planet(size='medium', organic='average', mineral='rich', environment='barren', gravity='heavy')
+        eq_(planetx.gravity, 'heavy')
+
+    @raises(Exception)
+    def test_create_planet_planet(self):
+        planetx = Planet('planet', size='huge', organic='rich', mineral='rich', environment='toxic')
+        planetx.create_planet(size='medium', organic='average', mineral='rich', environment='barren')
+
+    @raises(Exception)
+    def test_create_planet_missing_property1(self):
+        planetx = Planet('asteroids')
+        planetx.create_planet(size='medium', organic='average', mineral='rich')
+
+    @raises(Exception)
+    def test_create_planet_missing_property2(self):
+        planetx = Planet('asteroids')
+        planetx.create_planet(size='medium', mineral='rich', environment='barren')
+
+    @raises(Exception)
+    def test_create_planet_missing_property3(self):
+        planetx = Planet('asteroids')
+        planetx.create_planet(size='medium', organic='average', environment='barren')
+
+    @raises(Exception)
+    def test_create_planet_missing_property4(self):
+        planetx = Planet('asteroids')
+        planetx.create_planet(organic='average', mineral='rich', environment='barren')
+
+    @raises(Exception)
+    def test_create_planet_missing_property5(self):
+        planetx = Planet('asteroids')
+        planetx.create_planet()
+
     def test_planet_strings_asteroids(self):
         planetx = Planet('asteroids')
         eq_(str(planetx), 'This is asteroids field')
