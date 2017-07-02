@@ -1,244 +1,113 @@
 # vim: set ts=4 sw=4 et: coding=UTF-8
 
-from ..probabilities import determine_probability, get_50_50
+# import specific exceptions
+
+planetgravity = {"tiny": {"ultrapoor": "low", "poor": "low", "average": "low", "rich": "medium", "ultrarich": "medium"},
+                 "small": {"ultrapoor": "low", "poor": "low", "average": "medium", "rich": "medium", "ultrarich": "medium"},
+                 "medium": {"ultrapoor": "low", "poor": "medium", "average": "medium", "rich": "medium", "ultrarich": "heavy"},
+                 "large": {"ultrapoor": "medium", "poor": "medium", "average": "medium", "rich": "heavy", "ultrarich": "heavy"},
+                 "huge": {"ultrapoor": "medium", "poor": "medium", "average": "heavy", "rich": "heavy", "ultrarich": "heavy"}}
 
 
 class Planet(object):
 
-    """
-    Object containing all information and
-    getters for Planets
-    """
+    """object holding information about planet."""
 
-    # FIXME: read this from game configuration
-    # change to Universe Age
-    mineral_rich = False
-    organic_rich = False
+    def __init__(self, kind, **kwarg):
+        if kind not in ("asteroids", "giant", "planet"):
+            raise Exception  # TODO: specific extension for unknow planet type
 
-    # Default planet identifiers
-    # type of planet: normal, asteroids, gas giant, ...
-    setup = None
-    # size of the planet Tiny -> Huge
-    size = None
-    # minerals of the planet Ultra rich -> Ultra poor
-    minerals = None
-    # radiated/Toxic -> Gaia
-    biology = None
-    # gravitation of planet
-    gravity = None
-    # have native inhabitants?
-    natives = False
-    # have ancient artefacts?
-    artefacts = False
-    # have gold deposits?
-    gold_deposits = False
-    # have gem deposits?
-    gem_deposits = False
+        self._gravity = None
+        self.kind = kind
 
-    def __determine_type(self):
-        """
-        Figure out what type the planet wil be.
+        if kind == "asteroids":
+            return
+        if kind == "giant":
+            self.outpost = kwarg['outpost'] if 'outpost' in kwarg else None
+            return
 
-        We can be 3 types:
-        Normal, Asteroids, Gas giant
-        30% asteroids/gas-giant
-        70% planet
-        """
-        if determine_probability(30):
-            # Asteroids/Gas giant
-            return get_50_50("Asteroids", "Gas giant")
-        return "Normal"
+        for i in ("size", "organic", "mineral", "environment"):
+            if i not in kwarg:
+                raise Exception  # TODO specific exception for missing
 
-    def __determine_size(self):
-        """
-        Figure out size for the planet.
+        self.size = kwarg['size']
+        self.organic = kwarg['organic']
+        self.mineral = kwarg['mineral']
+        self.environment = kwarg['environment']
+        self.colony = kwarg['colony'] if 'colony' in kwarg else None
+        if not self.colony:
+            self.outpost = kwarg['outpost'] if 'outpost' in kwarg else None
+        else:
+            self.outpost = None
 
-        We can have following types:
-        Huge, Large, Medium, Small, tiny
-        Using normal distribtuion:
-        68.2 Medium
-        27.2 Large/Small
-        4.6 Huge/Tiny
-        """
+        if 'gravity' in kwarg:
+            self.gravity = kwarg['gravity']
+        else:
+            self.gravity
 
-        # Gas giant can be only Large/Huge
-        if self.setup == "Gas giant":
-            return get_50_50("Huge", "Large")
+        self.special = kwarg['special'] if 'special' in kwarg else None
+        self.homeworld = True if self.special == 'homeworld' else False
 
-        if determine_probability(4.6):
-            return get_50_50("Huge", "Tiny")
-        if determine_probability(27.2):
-            return get_50_50("Large", "Small")
-        return "Normal"
+    @property
+    def gravity(self):
+        """Set gravity of planet."""
+        return self._gravity
 
-    def __determine_minerals(self):
-        """
-        Figure out minerals for the planet.
-        """
+    @gravity.setter
+    def gravity(self, value):
+        if self.kind == 'asteroids' and value is not None:
+            raise Exception  # TODO: specific exception
+        if value not in ('low', 'medium', 'heavy', None):
+            raise Exception  # TODO: specific exception
+        if self.kind not in ('planet', 'asteroids'):
+            raise Exception  # TODO: specific exception
+        self._gravity = value
 
-        # Determine unverse layout
-        penalty = 0
-        probability_skew = 0
-        if self.mineral_rich:
-            probability_skew = 5
-            penalty = -15
-        if self.organic_rich:
-            penalty = 15
+    @gravity.getter
+    def gravity(self):
+        if self.kind == 'asteroids':
+            del self.gravity
+        elif self.kind == 'planet':
+            if not self._gravity:
+                self._gravity = planetgravity[self.size][self.mineral]
+        else:
+            raise Exception  # TODO: specific exception
+        return self._gravity
 
-        """
-        We can have following types:
-        Ultra rich, Rich, Abundant, Poor, Ultra poor
-        We will use normal distribution, but can skew in/out depending
-        on game settings for the play:
-        68.2 Abundant
-        27.2 Rich/Poor
-        4.6 Ultra rich/Ultra poor
-        """
-        if determine_probability(4.6 + probability_skew):
-            return get_50_50("Ultra rich", "Ultra poor", penalty)
-        if determine_probability(27.2 + probability_skew):
-            return get_50_50("Rich", "Poor", penalty)
-        return "Abundant"
+    @gravity.deleter
+    def gravity(self):
+        self._gravity = None
 
-    def __determine_biology(self):
-        """
-        Figure out minerals for the planet.
-        """
+    # destroy planet --> stellar converter --> reinit as asteroids
+    def destroy_planet(self):
+        """Set planet as asteroid field and sets all planet attributes to None/False."""
+        self.gravity = None
+        self.kind = 'asteroids'
+        self.size = None
+        self.organic = None
+        self.mineral = None
+        self.colony = None
+        self.outpost = None
+        self.special = None
+        self.homeworld = False
+        self.environment = None
 
-        # Determine unverse layout
-        probability_skew = 0
-        if self.mineral_rich:
-            probability_skew = -5
-        if self.organic_rich:
-            probability_skew = 5
-
-        # For future planet creation we can consider these barren
-        if not self.setup == "Normal":
-            return "Barren"
-
-        """
-        We can have following types:
-        0    1      2             3                4                 5
-        Gaia/Terran/(Swamp/Ocean)/(Tundra/Dessert)/(Barren/Radiated)/Toxic
-        We will use normal distribution, but can skew in/out depending
-        on game settings for the play:
-        6% 0
-        10% 1
-        19% 2 or 3 in organic_rich
-        36% 3 or 4 in mineral_rich or 2 in organic_rich
-        19% 4 or 3 in mineral_rich
-        10% 5
-        """
-        if determine_probability(6 + probability_skew):
-            return "Gaia"
-        if determine_probability(10 + probability_skew):
-            return "Terran"
-        if determine_probability(19):
-            if self.organic_rich:
-                return get_50_50("Tundra", "Dessert")
+    def __str__(self):
+        if self.kind == 'asteroids':
+            tmpstr = "This is asteroids field"
+        elif self.kind == 'giant':
+            if self.outpost:
+                tmpstr = "This is gas giant planet with outpost: {!s}".format(self.outpost)
             else:
-                return get_50_50("Swamp", "Ocean")
-        if determine_probability(36 + probability_skew):
-            if self.mineral_rich:
-                return get_50_50("Barren", "Radiated")
-            elif self.organic_rich:
-                return get_50_50("Swamp", "Ocean")
-            else:
-                return get_50_50("Tundra", "Dessert")
-        if determine_probability(19):
-            if self.mineral_rich:
-                return get_50_50("Tundra", "Dessert")
-            else:
-                return get_50_50("Barren", "Radiated")
-        if determine_probability(10):
-            return "Toxic"
-
-        # If user got here he is not lucky one
-        return get_50_50("Barren", "Radiated")
-
-    def __determine_gravity(self):
-        """
-        Figure out gravitation on the planet.
-
-        We can have following types:
-        Low/Normal/High
-        For the distribution we actually need to take planet size in the
-        account:
-        tiny/small -> low, normal gravity
-        normal -> low, normal, high gravity
-        large/huge -> normal, high gravity
-        """
-
-        if self.size == "Tiny":
-            return get_50_50("Low", "Normal")
-        if self.size == "Small":
-            return get_50_50("Low", "Normal", 15)
-        if self.size == "Normal":
-            if determine_probability(15):
-                return "Low"
-            if determine_probability(15):
-                return "High"
-            return "Normal"
-        if self.size == "Large":
-            return get_50_50("High", "Normal", 15)
-        if self.size == "Huge":
-            return get_50_50("High", "Normal")
-
-    def __determine_specialities(self):
-        """
-        Decide all various special factors for the planet.
-        """
-
-        # If the planet can support life it might already have some
-        if self.biology == "Gaia":
-            if determine_probability(15):
-                self.natives = True
-        if self.biology == "Terran":
-            if determine_probability(10):
-                self.natives = True
-
-        # On life supporting planets there might've been civilization
-        if self.biology == "Gaia" or self.biology == "Terran":
-            if determine_probability(10):
-                self.artefacts = True
-
-        # Based on planet minerals we can get extra perks
-        if self.minerals == "Ultra rich":
-            if determine_probability(15):
-                self.gem_deposits = True
-            if determine_probability(15) and not self.gem_deposits:
-                self.gold_deposits = True
-        if self.minerals == "Rich":
-            if determine_probability(10):
-                self.gem_deposits = True
-            if determine_probability(10) and not self.gem_deposits:
-                self.gold_deposits = True
-        if self.minerals == "Abundant":
-            if determine_probability(5):
-                self.gem_deposits = True
-            if determine_probability(5) and not self.gem_deposits:
-                self.gold_deposits = True
-
-    def __init__(self):
-        """
-        Generate new planet.
-        """
-        return
-
-    # FIXME: integrate color of star in system
-    def randomize(self):
-        """
-        Radomize content of the planet for space creation.
-        """
-        self.setup = self.__determine_type()
-        # we determine size/minerals for future planetary creation from asteroids/etc
-        self.size = self.__determine_size()
-        self.minerals = self.__determine_minerals()
-        self.biology = self.__determine_biology()
-        self.gravity = self.__determine_gravity()
-        self.__determine_specialities()
-
-    def print_state(self):
-        """
-        Nicely print the state of the planet.
-        """
+                tmpstr = "This is gas giant planet"
+        elif self.kind == 'planet':
+            tmpstr = "Planet size: {!s} gravity: {!s} with {!s} environment\n".format(
+                self.size, self.gravity, self.environment)
+            tmpstr += "Has {!s} minerals and {!s} biology\n".format(self.mineral, self.organic)
+            if self.special:
+                tmpstr += "Has {!s} special\n".format(self.special)
+            if self.outpost:
+                tmpstr += "Has {!s} outpost".format(self.outpost)
+            elif self.colony:
+                tmpstr += "Is colonized:\n {!s}".format(self.colony)
+        return tmpstr
