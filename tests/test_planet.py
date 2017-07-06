@@ -9,16 +9,17 @@ from openmoo2.objects.planet import Planet
 
 class FakeColony(object):
 
-    def __init__(self, owner):
+    def __init__(self, kind, owner):
         self.owner = owner
+        self.kind = kind
 
     def __str__(self):
         return self.owner
 
 
 class TestPlanet(object):
-    outpost = FakeColony('Boo')
-    colony = FakeColony('Poo')
+    outpost = FakeColony('outpost', 'Boo')
+    colony = FakeColony('colony', 'Poo')
 
     @raises(Exception)  # TODO: specific exception
     def test_planet_wrong_type(self):
@@ -47,10 +48,13 @@ class TestPlanet(object):
         del planetx.gravity
         eq_(planetx.gravity, 'low')
 
-    @raises(Exception)  # TODO: specific exceptions
     def test_read_gravity_giant(self):
         planetx = Planet('giant')
-        planetx.gravity
+        eq_(planetx.gravity, None)
+
+    def test_read_gravity_asteroids(self):
+        planetx = Planet('asteroids')
+        eq_(planetx.gravity, None)
 
     @raises(Exception)  # TODO: specific Exception
     def test_set_gravity_giant(self):
@@ -130,7 +134,7 @@ class TestPlanet(object):
             organic='average',
             mineral='rich',
             environment='barren',
-            outpost=self.outpost)
+            colony=self.outpost)
         eq_(planetx.gravity, 'medium')
         eq_(planetx.outpost, None)
 
@@ -169,6 +173,73 @@ class TestPlanet(object):
         planetx = Planet('asteroids')
         planetx.create_planet()
 
+    def test_colony_asteroids1(self):
+        planetx = Planet('asteroids', colony=self.outpost)
+        eq_(planetx.colony, None)
+
+    def test_colony_asteroids2(self):
+        planetx = Planet('asteroids', colony=self.colony)
+        eq_(planetx.colony, None)
+
+    @raises(Exception)
+    def test_colony_set_asteroids(self):
+        planetx = Planet('asteroids')
+        planetx.colony = self.outpost
+
+    @raises(Exception)
+    def test_colony_set_asteroids2(self):
+        planetx = Planet('asteroids')
+        planetx.colony = self.colony
+
+    def test_giant_outpost(self):
+        planetx = Planet('giant', colony=self.outpost)
+        eq_(planetx.colony.kind, 'outpost')
+
+    @raises(Exception)
+    def test_giant_colony(self):
+        Planet('giant', colony=self.colony)
+
+    @raises(Exception)
+    def test_set_colony_giant(self):
+        planetx = Planet('giant')
+        planetx.colony = self.colony
+
+    def test_planet_colony(self):
+        planetx = Planet(
+            'planet',
+            size='small',
+            organic='rich',
+            mineral='average',
+            environment='gaia',
+            colony=self.colony)
+        eq_(planetx.colony.kind, 'colony')
+
+    def test_planet_outpost(self):
+        planetx = Planet(
+            'planet',
+            size='small',
+            organic='rich',
+            mineral='average',
+            environment='gaia',
+            colony=self.outpost)
+        eq_(planetx.colony.kind, 'outpost')
+
+    def test_del_colony_planet(self):
+        planetx = Planet(
+            'planet',
+            size='small',
+            organic='rich',
+            mineral='average',
+            environment='gaia',
+            colony=self.colony)
+        del planetx.colony
+        eq_(planetx.colony, None)
+
+    def test_del_outpost_giant(self):
+        planetx = Planet('giant', colony=self.outpost)
+        del planetx.colony
+        eq_(planetx.colony, None)
+
     def test_planet_strings_asteroids(self):
         planetx = Planet('asteroids')
         eq_(str(planetx), 'This is asteroids field')
@@ -178,7 +249,7 @@ class TestPlanet(object):
         eq_(str(planetx), 'This is gas giant planet')
 
     def test_planet_strings_giant_outpost(self):
-        planetx = Planet('giant', outpost=self.outpost)
+        planetx = Planet('giant', colony=self.outpost)
         eq_(str(planetx), 'This is gas giant planet with outpost: Boo')
 
     def test_planet_strings_planet(self):
@@ -192,7 +263,7 @@ class TestPlanet(object):
             organic='rich',
             mineral='average',
             environment='gaia',
-            outpost=self.outpost)
+            colony=self.outpost)
         eq_(str(planetx), 'Planet size: small gravity: medium with gaia environment\nHas average minerals and rich biology\nHas Boo outpost')
 
     def test_planet_strings_planet_colony(self):
