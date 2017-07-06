@@ -17,13 +17,17 @@ class Planet(object):
         if kind not in ("asteroids", "giant", "planet"):
             raise Exception  # TODO: specific extension for unknow planet type
 
+        # holds planet gravity
         self._gravity = None
+        # holds colony -- can be colony or outpost
+        self._colony = None
+
         self.kind = kind
 
         if kind == "asteroids":
             return
         if kind == "giant":
-            self.outpost = kwarg['outpost'] if 'outpost' in kwarg else None
+            self.colony = kwarg['colony'] if 'colony' in kwarg else None
             return
 
         for i in ("size", "organic", "mineral", "environment"):
@@ -35,10 +39,6 @@ class Planet(object):
         self.mineral = kwarg['mineral']
         self.environment = kwarg['environment']
         self.colony = kwarg['colony'] if 'colony' in kwarg else None
-        if not self.colony:
-            self.outpost = kwarg['outpost'] if 'outpost' in kwarg else None
-        else:
-            self.outpost = None
 
         if 'gravity' in kwarg:
             self.gravity = kwarg['gravity']
@@ -65,18 +65,40 @@ class Planet(object):
 
     @gravity.getter
     def gravity(self):
-        if self.kind == 'asteroids':
+        if self.kind in ('asteroids', 'giant'):
             del self.gravity
         elif self.kind == 'planet':
             if not self._gravity:
                 self._gravity = planetgravity[self.size][self.mineral]
-        else:
-            raise Exception  # TODO: specific exception
         return self._gravity
 
     @gravity.deleter
     def gravity(self):
         self._gravity = None
+
+    @property
+    def colony(self):
+        """Colony setter for planet/giant"""
+        return self._colony
+
+    @colony.setter
+    def colony(self, value):
+        if self.kind == 'asteroids' and value is not None:
+            raise Exception  # TODO: specific exception
+        if self.kind == 'giant' and value is not None:
+            if value.kind != 'outpost':
+                raise Exception  # TODO: specific exception
+        self._colony = value
+
+    @colony.getter
+    def colony(self):
+        if self.kind == 'asteroids':
+            del self.colony
+        return self._colony
+
+    @colony.deleter
+    def colony(self):
+        self._colony = None
 
     # destroy planet --> stellar converter --> reinit as asteroids
     def destroy_planet(self):
@@ -119,8 +141,8 @@ class Planet(object):
         if self.kind == 'asteroids':
             tmpstr = "This is asteroids field"
         elif self.kind == 'giant':
-            if self.outpost:
-                tmpstr = "This is gas giant planet with outpost: {!s}".format(self.outpost)
+            if self.colony:
+                tmpstr = "This is gas giant planet with outpost: {!s}".format(self.colony)
             else:
                 tmpstr = "This is gas giant planet"
         elif self.kind == 'planet':
@@ -129,8 +151,9 @@ class Planet(object):
             tmpstr += "Has {!s} minerals and {!s} biology\n".format(self.mineral, self.organic)
             if self.special:
                 tmpstr += "Has {!s} special\n".format(self.special)
-            if self.outpost:
-                tmpstr += "Has {!s} outpost".format(self.outpost)
-            elif self.colony:
-                tmpstr += "Is colonized:\n {!s}".format(self.colony)
+            if self.colony:
+                if self.colony.kind == 'outpost':
+                    tmpstr += "Has {!s} outpost".format(self.colony)
+                elif self.colony.kind == 'colony':
+                    tmpstr += "Is colonized:\n {!s}".format(self.colony)
         return tmpstr
