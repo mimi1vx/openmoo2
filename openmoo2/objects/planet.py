@@ -51,6 +51,11 @@ class Planet(object):
     @property
     def gravity(self):
         """Set gravity of planet."""
+        if self.kind in ('asteroids', 'giant'):
+            del self.gravity
+        elif self.kind == 'planet':
+            if not self._gravity:
+                self._gravity = planetgravity[self.size][self.mineral]
         return self._gravity
 
     @gravity.setter
@@ -63,15 +68,6 @@ class Planet(object):
             raise Exception  # TODO: specific exception
         self._gravity = value
 
-    @gravity.getter
-    def gravity(self):
-        if self.kind in ('asteroids', 'giant'):
-            del self.gravity
-        elif self.kind == 'planet':
-            if not self._gravity:
-                self._gravity = planetgravity[self.size][self.mineral]
-        return self._gravity
-
     @gravity.deleter
     def gravity(self):
         self._gravity = None
@@ -79,6 +75,8 @@ class Planet(object):
     @property
     def colony(self):
         """Colony setter for planet/giant"""
+        if self.kind == 'asteroids':
+            del self.colony
         return self._colony
 
     @colony.setter
@@ -89,12 +87,6 @@ class Planet(object):
             if value.kind != 'outpost':
                 raise Exception  # TODO: specific exception
         self._colony = value
-
-    @colony.getter
-    def colony(self):
-        if self.kind == 'asteroids':
-            del self.colony
-        return self._colony
 
     @colony.deleter
     def colony(self):
