@@ -136,7 +136,7 @@ class TestPlanet(object):
             environment='barren',
             colony=self.outpost)
         eq_(planetx.gravity, 'medium')
-        eq_(planetx.outpost, None)
+        eq_(planetx.colony, None)
 
     def test_create_planet_asteroids_gravity(self):
         planetx = Planet('asteroids')

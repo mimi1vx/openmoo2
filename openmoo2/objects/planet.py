@@ -18,9 +18,9 @@ class Planet(object):
             raise Exception  # TODO: specific extension for unknow planet type
 
         # holds planet gravity
-        self._gravity = None
+        self.__gravity = None
         # holds colony -- can be colony or outpost
-        self._colony = None
+        self.__colony = None
 
         self.kind = kind
 
@@ -54,9 +54,9 @@ class Planet(object):
         if self.kind in ('asteroids', 'giant'):
             del self.gravity
         elif self.kind == 'planet':
-            if not self._gravity:
-                self._gravity = planetgravity[self.size][self.mineral]
-        return self._gravity
+            if not self.__gravity:
+                self.__gravity = planetgravity[self.size][self.mineral]
+        return self.__gravity
 
     @gravity.setter
     def gravity(self, value):
@@ -66,18 +66,18 @@ class Planet(object):
             raise Exception  # TODO: specific exception
         if self.kind not in ('planet', 'asteroids'):
             raise Exception  # TODO: specific exception
-        self._gravity = value
+        self.__gravity = value
 
     @gravity.deleter
     def gravity(self):
-        self._gravity = None
+        self.__gravity = None
 
     @property
     def colony(self):
         """Colony setter for planet/giant"""
         if self.kind == 'asteroids':
             del self.colony
-        return self._colony
+        return self.__colony
 
     @colony.setter
     def colony(self, value):
@@ -86,11 +86,11 @@ class Planet(object):
         if self.kind == 'giant' and value is not None:
             if value.kind != 'outpost':
                 raise Exception  # TODO: specific exception
-        self._colony = value
+        self.__colony = value
 
     @colony.deleter
     def colony(self):
-        self._colony = None
+        self.__colony = None
 
     # destroy planet --> stellar converter --> reinit as asteroids
     def destroy_planet(self):
@@ -101,7 +101,6 @@ class Planet(object):
         self.organic = None
         self.mineral = None
         self.colony = None
-        self.outpost = None
         self.special = None
         self.homeworld = False
         self.environment = None
@@ -116,7 +115,7 @@ class Planet(object):
                 raise Exception  # TODO specific exception for missing
 
         if self.kind == 'giant':
-            self.outpost = None
+            self.colony = None
 
         self.kind = 'planet'
         self.size = kwarg['size']
