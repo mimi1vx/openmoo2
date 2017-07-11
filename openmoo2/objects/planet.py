@@ -43,7 +43,7 @@ class Planet(object):
         if 'gravity' in kwarg:
             self.gravity = kwarg['gravity']
         else:
-            self.gravity
+            self.gravity = 'default'
 
         self.special = kwarg['special'] if 'special' in kwarg else None
         self.homeworld = True if self.special == 'homeworld' else False
@@ -53,24 +53,27 @@ class Planet(object):
         """Set gravity of planet."""
         if self.kind in ('asteroids', 'giant'):
             del self.gravity
-        elif self.kind == 'planet':
-            if not self.__gravity:
-                self.__gravity = planetgravity[self.size][self.mineral]
         return self.__gravity
 
     @gravity.setter
     def gravity(self, value):
         if self.kind == 'asteroids' and value is not None:
             raise Exception  # TODO: specific exception
-        if value not in ('low', 'medium', 'heavy', None):
+        if value not in ('low', 'medium', 'heavy', 'default', None):
             raise Exception  # TODO: specific exception
         if self.kind not in ('planet', 'asteroids'):
             raise Exception  # TODO: specific exception
-        self.__gravity = value
+        if self.kind == 'planet' and value == 'default':
+            self.__gravity = planetgravity[self.size][self.mineral]
+        else:
+            self.__gravity = value
 
     @gravity.deleter
     def gravity(self):
-        self.__gravity = None
+        if self.kind in ('asteroids', 'giant'):
+            self.__gravity = None
+        elif self.kind == 'planet':
+            self.__gravity = planetgravity[self.size][self.mineral]
 
     @property
     def colony(self):
@@ -126,7 +129,7 @@ class Planet(object):
         if 'gravity' in kwarg:
             self.gravity = kwarg['gravity']
         else:
-            self.gravity
+            self.gravity = 'default'
 
     def __str__(self):
         if self.kind == 'asteroids':
