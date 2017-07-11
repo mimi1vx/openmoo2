@@ -7,22 +7,19 @@ class StarSystem(object):
     _systems = set()
     max_planets = 5
 
-    def __init__(self, name, color, **kwargs):
+    def __init__(self, name, color):
         """Initialize star system."""
         self.color = color
         self.__name = None
         self.name = name
-        self.__planets = None
-        self.administrator = None
-
+        self.__planets = {}
+        self.__administrator = None
 
     @property
     def planets(self):
         """Property handling dict of planets."""
         if self.color == 'black':
-            return {}
-        if len(self.__planets) > StarSystem.max_planets:
-            raise Exception
+            return {x + 1: None for x in range(StarSystem.max_planets)}
         return self.__planets
 
     @planets.setter
@@ -32,7 +29,7 @@ class StarSystem(object):
         counter = len(self.__planets)
         if counter >= StarSystem.max_planets:
             raise Exception
-        self.__planets[counter+1] = planet
+        self.__planets[counter + 1] = planet
 
     @planets.deleter
     def planets(self):
@@ -40,12 +37,12 @@ class StarSystem(object):
 
     @property
     def administrator(self):
-        if self.color == 'black':
-            raise Exception
         return self.__administrator
 
     @administrator.setter
     def administrator(self, admin):
+        if self.color == 'black':
+            raise Exception
         self.__administrator = admin
 
     @administrator.deleter
