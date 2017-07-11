@@ -65,3 +65,8 @@ class StarSystem(object):
     @name.deleter
     def name(self):
         pass
+
+    def supernova(self):
+        self.color = 'black'
+        self.__administrator = None
+        self.__planets = {x + 1: None for x in range(StarSystem.max_planets)}

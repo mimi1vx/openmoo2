@@ -42,9 +42,11 @@ class TestSystem(object):
         eq_(star.planets, {})
         ok_('foo' in star._systems)
 
-    def test_star_add_planet(self):
+    def test_star_add_delete_planet(self):
         star = StarSystem("boo", "orange")
         star.planets = "one"
+        eq_(star.planets, {1: 'one'})
+        del star.planets
         eq_(star.planets, {1: 'one'})
 
     @raises(Exception)
@@ -72,3 +74,22 @@ class TestSystem(object):
         eq_(star.administrator, "emperor")
         del star.administrator
         eq_(star.administrator, None)
+
+    def test_delete_name(self):
+        star = StarSystem("alfa", "blue")
+        eq_(star.name, 'alfa')
+        del star.name
+        eq_(star.name, 'alfa')
+
+    def test_supernova(self):
+        star = StarSystem("beta", "yellow")
+        star.administrator = "wolf"
+        star.planets = "asteroids"
+        star.planets = "planet"
+        star.planets = "planet"
+        star.planets = "giant"
+        eq_(star.planets, {1: 'asteroids', 2: 'planet', 3: 'planet', 4: 'giant'})
+        star.supernova()
+        eq_(star.administrator, None)
+        eq_(star.color, 'black')
+        eq_(star.planets, {x + 1: None for x in range(StarSystem.max_planets)})
