@@ -70,3 +70,12 @@ class StarSystem(object):
         self.color = 'black'
         self.__administrator = None
         self.__planets = {x + 1: None for x in range(StarSystem.max_planets)}
+
+    def __str__(self):
+        if self.color == 'black':
+            return "Black hole star system named: {!s}".format(self.name)
+        tmpstring = "{!s} star named {!s} with planets:\n".format(self.color, self.name)
+        tmpstring += "".join(["Orbit {!s}:\n {!s}\n".format(x, y) for x, y in self.planets.items() if y])
+        if self.administrator:
+            tmpstring += "Star system has assigned administrator: {!s}".format(self.administrator)
+        return tmpstring

@@ -93,3 +93,23 @@ class TestSystem(object):
         eq_(star.administrator, None)
         eq_(star.color, 'black')
         eq_(star.planets, {x + 1: None for x in range(StarSystem.max_planets)})
+
+    def test_string_blackhole(self):
+        eq_(str(self.blackhole), "Black hole star system named: hole")
+
+    def test_string_planets(self):
+        star = StarSystem("gamma", "gelb")
+        star.planets = self.planetA
+        star.planets = self.planetD
+        star.planets = self.planetB
+        star.planets = self.planetC
+        eq_(str(star), 'gelb star named gamma with planets:\nOrbit 1:\n Planeta : asteroids\nOrbit 3:\n Planeta : giant\nOrbit 4:\n Planeta : planet\n')
+
+    def test_string_planets_administrator(self):
+        star = StarSystem("delta", "gelb")
+        star.planets = self.planetA
+        star.planets = self.planetD
+        star.planets = self.planetB
+        star.planets = self.planetC
+        star.administrator = "cpt. Kirk"
+        eq_(str(star),  'gelb star named delta with planets:\nOrbit 1:\n Planeta : asteroids\nOrbit 3:\n Planeta : giant\nOrbit 4:\n Planeta : planet\nStar system has assigned administrator: cpt. Kirk')
