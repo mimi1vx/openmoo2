@@ -27,7 +27,7 @@ class Planet(object):
         if kind == "asteroids":
             return
         if kind == "giant":
-            self.colony = kwarg['colony'] if 'colony' in kwarg else None
+            self.colony = kwarg.get('colony')
             return
 
         for i in ("size", "organic", "mineral", "environment"):
@@ -38,14 +38,14 @@ class Planet(object):
         self.organic = kwarg['organic']
         self.mineral = kwarg['mineral']
         self.environment = kwarg['environment']
-        self.colony = kwarg['colony'] if 'colony' in kwarg else None
+        self.colony = kwarg.get('colony')
 
         if 'gravity' in kwarg:
             self.gravity = kwarg['gravity']
         else:
             self.gravity = 'default'
 
-        self.special = kwarg['special'] if 'special' in kwarg else None
+        self.special = kwarg.get('special')
         self.homeworld = True if self.special == 'homeworld' else False
 
     @property
